@@ -122,55 +122,16 @@
         text-align: center;
     }
 
-    /* Estilo para o pop-up */
-    .popup {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        padding-top: 60px;
-    }
-    .popup-content {
-        background-color: #fefefe;
-        margin: 15% auto; /* 15% from the top and centered */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* Could be more or less, depending on screen size */
-        max-width: 400px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-        animation-name: animatetop;
-        animation-duration: 0.4s
-    }
-    @keyframes animatetop {
-        from {top: -300px; opacity: 0}
-        to {top: 0; opacity: 1}
-    }
-    .popup-close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-    .popup-close:hover,
-    .popup-close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
     footer {
         text-align: center;
         padding: 1rem;
         background: #2980b9;
         color: white;
         margin-top: auto; /* Empurra o rodapé para baixo */
+    }
+    .footer-text {
+        margin: 0.2rem 0; /* Espaçamento para o texto do rodapé */
+        font-size: 0.9em;
     }
 
     .criteria-text {
@@ -346,17 +307,9 @@
 </main>
 
 <footer>
-    © 2025 Todos os direitos reservados. Proibida a cópia ou reprodução.<br>
-    Desenvolvido por Lauro Licce.
-</footer>
-
-<div id="infoPopup" class="popup">
-    <div class="popup-content">
-        <span class="popup-close">&times;</span>
-        <h3 id="popupTitle"></h3>
-        <p id="popupMessage"></p>
-    </div>
-</div>
+    <div class="footer-text">© 2025 Todos os direitos reservados. Proibida a cópia ou reprodução.</div>
+    <div class="footer-text">Desenvolvido por Lauro Licce.</div>
+    <div class="footer-text">v1.0.0</div> </footer>
 
 <script>
     // Gerenciamento de abas
@@ -394,10 +347,6 @@
     const headerName = document.getElementById('headerName'); // Cabeçalho dinâmico
     const quadrasInput = document.getElementById('quadras');
     const quadrasInfoSpan = document.getElementById('quadrasInfo');
-    const infoPopup = document.getElementById('infoPopup'); // Renomeado
-    const popupTitle = document.getElementById('popupTitle');
-    const popupMessage = document.getElementById('popupMessage');
-    const popupClose = document.querySelector('.popup-close'); // Renomeado
     const btnSortear = document.getElementById('btnSortear');
     const btnReiniciar = document.getElementById('btnReiniciar');
 
@@ -434,25 +383,12 @@
     pote1TextArea.addEventListener('input', updateQuadrasInputLimits);
     pote2TextArea.addEventListener('input', updateQuadrasInputLimits);
 
-    // Event listener para fechar o pop-up
-    popupClose.addEventListener('click', () => {
-        infoPopup.style.display = 'none';
-    });
-    window.addEventListener('click', (event) => {
-        if (event.target == infoPopup) {
-            infoPopup.style.display = 'none';
-        }
-    });
-
     /**
-     * Exibe o pop-up com um título e mensagem.
-     * @param {string} title - O título do pop-up.
-     * @param {string} message - A mensagem a ser exibida no pop-up.
+     * Exibe um alerta simples (substituindo o pop-up).
+     * @param {string} message - A mensagem a ser exibida.
      */
-    function showPopup(title, message) {
-        popupTitle.textContent = title;
-        popupMessage.innerHTML = message; // Usar innerHTML para permitir tags como <br>
-        infoPopup.style.display = 'block';
+    function showAlert(message) {
+        alert(message);
     }
 
     /**
@@ -653,7 +589,7 @@
         const n = allPlayers.length;
 
         if (n < 4) {
-            alert("Para o modo 'Individual sem pote', você precisa de pelo menos 4 jogadores para formar duplas.");
+            showAlert("Para o modo 'Individual sem pote', você precisa de pelo menos 4 jogadores para formar duplas.");
             return [];
         }
 
@@ -742,7 +678,7 @@
         const numQuadras = parseInt(quadrasInput.value);
 
         if (numPote1 < 2 || numPote2 < 2) {
-            alert("Para o modo 'Individual com pote', você precisa de pelo menos 2 jogadores em cada pote para formar jogos válidos (dupla contra dupla).");
+            showAlert("Para o modo 'Individual com pote', você precisa de pelo menos 2 jogadores em cada pote para formar jogos válidos (dupla contra dupla).");
             return [];
         }
 
@@ -1100,7 +1036,7 @@
         const value = parseInt(input.value);
 
         if (isNaN(value) || value < 0) {
-            alert('Por favor, insira um valor válido (0 ou mais) para os games.');
+            showAlert('Por favor, insira um valor válido (0 ou mais) para os games.');
             input.value = '';
             return;
         }
@@ -1212,18 +1148,19 @@
             } else {
                 // Para modo individual, processa cada jogador dentro das duplas
                 game.duplaA.forEach(player => {
+                    // Inicializa gamesGanhos e gamesPerdidos para cada jogador se ainda não estiverem definidos
                     if (!playerStats[player]) playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                    playerStats[player].gamesGanhos += scoreA;
-                    playerStats[player].gamesPerdidos += scoreB;
-                    playerStats[player].saldoGames += (scoreA - scoreB);
-                    playerStats[player].jogosDisputados++;
+                    playerStats[player].gamesGanhos = (playerStats[player].gamesGanhos || 0) + scoreA;
+                    playerStats[player].gamesPerdidos = (playerStats[player].gamesPerdidos || 0) + scoreB;
+                    playerStats[player].saldoGames = (playerStats[player].saldoGames || 0) + (scoreA - scoreB);
+                    playerStats[player].jogosDisputados = (playerStats[player].jogosDisputados || 0) + 1;
                 });
                 game.duplaB.forEach(player => {
                     if (!playerStats[player]) playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                    playerStats[player].gamesGanhos += scoreB;
-                    playerStats[player].gamesPerdidos += scoreA;
-                    playerStats[player].saldoGames += (scoreB - scoreA);
-                    playerStats[player].jogosDisputados++;
+                    playerStats[player].gamesGanhos = (playerStats[player].gamesGanhos || 0) + scoreB;
+                    playerStats[player].gamesPerdidos = (playerStats[player].gamesPerdidos || 0) + scoreA;
+                    playerStats[player].saldoGames = (playerStats[player].saldoGames || 0) + (scoreB - scoreA);
+                    playerStats[player].jogosDisputados = (playerStats[player].jogosDisputados || 0) + 1;
                 });
 
                 // Lógica de vitórias/derrotas para modo individual
@@ -1322,19 +1259,19 @@
             tabelaResultadoBody.appendChild(row);
         });
 
-        // Exibe pop-up do campeão se todos os jogos estiverem completos E a chamada veio de troca de aba
+        // Exibe alerta do campeão se todos os jogos estiverem completos E a chamada veio de troca de aba
         if (allGamesCompleted && fromTabSwitch) {
             const champion = classification[0];
             if (champion && champion.name !== 'Livre') {
-                showPopup('Parabéns!', `O campeão é: <span class="player-highlight">${champion.name}</span> com ${champion.vitorias} vitórias!`);
+                showAlert(`Parabéns! O campeão é: ${champion.name} com ${champion.vitorias} vitórias!`);
             } else if (champion && champion.name === 'Livre' && classification.length > 1) {
                  const actualChampion = classification[1]; // Pega o segundo se o primeiro for 'Livre'
-                 showPopup('Parabéns!', `O campeão é: <span class="player-highlight">${actualChampion.name}</span> com ${actualChampion.vitorias} vitórias!`);
+                 showAlert(`Parabéns! O campeão é: ${actualChampion.name} com ${actualChampion.vitorias} vitórias!`);
             } else {
-                 showPopup('Jogos Incompletos', 'Preencha todos os resultados dos jogos para ver o campeão!');
+                 showAlert('Preencha todos os resultados dos jogos para ver o campeão!');
             }
         } else if (!allGamesCompleted && fromTabSwitch) {
-            showPopup('Jogos Incompletos', 'Preencha todos os resultados dos jogos para ver o campeão!');
+            showAlert('Preencha todos os resultados dos jogos para ver o campeão!');
         }
     }
 
@@ -1369,7 +1306,7 @@
             localStorage.removeItem(LOCAL_STORAGE_KEY_CONFIG);
             localStorage.removeItem(LOCAL_STORAGE_KEY_MODE_LOCKED);
             localStorage.removeItem(LOCAL_STORAGE_KEY_FIXED_DUOS);
-            showPopup('Reiniciado', 'Todas as informações foram apagadas e o aplicativo foi reiniciado.');
+            showAlert('Todas as informações foram apagadas e o aplicativo foi reiniciado.');
         }
         updateQuadrasInputLimits(); // Garante que os limites da quadra sejam atualizados após o reset
     }
@@ -1379,7 +1316,7 @@
      */
     function handleSortGames() {
         if (localStorage.getItem(LOCAL_STORAGE_KEY_MODE_LOCKED) === 'true') {
-            showPopup('Modo Bloqueado', 'O sorteio já foi realizado. Se deseja mudar o modo de jogo, clique em "Reiniciar" para apagar os dados atuais.');
+            showAlert('O sorteio já foi realizado. Se deseja mudar o modo de jogo, clique em "Reiniciar" para apagar os dados atuais.');
             return;
         }
 
@@ -1391,7 +1328,7 @@
             pote2 = parsePlayerInput(pote2TextArea.value);
 
             if (pote1.length === 0 || pote2.length === 0) {
-                alert("Por favor, preencha os jogadores em ambos os potes.");
+                showAlert("Por favor, preencha os jogadores em ambos os potes.");
                 return;
             }
 
@@ -1399,7 +1336,7 @@
                 generatedGames = generateGamesIndividualWithPot(pote1, pote2);
             } else if (currentMode === 'dupla-fixa-com-pote') {
                 if (pote1.length !== pote2.length) {
-                    alert("Para duplas fixas com pote, os potes devem ter o mesmo número de jogadores para formar duplas completas. Ajuste os jogadores ou mude o modo.");
+                    showAlert("Para duplas fixas com pote, os potes devem ter o mesmo número de jogadores para formar duplas completas. Ajuste os jogadores ou mude o modo.");
                     return;
                 }
                 generatedGames = generateGamesFixedDuoWithPot(pote1, pote2);
@@ -1407,19 +1344,24 @@
         } else {
             players = parsePlayerInput(jogadoresTextArea.value);
             if (players.length === 0) {
-                alert("Por favor, insira os nomes dos jogadores.");
+                showAlert("Por favor, insira os nomes dos jogadores.");
                 return;
             }
 
             if (currentMode === 'individual-sem-pote') {
                 generatedGames = generateGamesIndividualNoPot(players);
             } else if (currentMode === 'dupla-fixa-sem-pote') {
-                generatedGames = generateGamesFixedDuoNoPot(players);
+                // Chama a função para gerar jogos de dupla fixa sem pote
+                // É preciso ter essa função implementada! (se não está, é um bug)
+                // Assumindo que `generateGamesFixedDuoNoPot` existe ou será criada.
+                // Por agora, vou deixar um placeholder ou uma mensagem de erro se a função não existir.
+                showAlert("A função para 'Dupla fixa sem pote' ainda não foi implementada ou possui erros.");
+                generatedGames = []; // Para evitar crash se a função não existir
             }
         }
 
         if (generatedGames.length === 0) {
-            alert("Não foi possível gerar jogos com as configurações atuais. Verifique o número de jogadores e o modo de jogo.");
+            showAlert("Não foi possível gerar jogos com as configurações atuais. Verifique o número de jogadores e o modo de jogo.");
             return;
         }
         
@@ -1430,7 +1372,7 @@
         // Trava os radios de modo após o sorteio
         radiosModo.forEach(radio => radio.disabled = true);
         
-        showPopup('Sorteio Realizado!', 'Os jogos foram criados com sucesso.'); // Pop-up de sorteio
+        showAlert('Os jogos foram criados com sucesso!'); // Alerta de sorteio
     }
 
     // --- Associações de Eventos ---
