@@ -5,32 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Super 8 - Beach Tennis</title>
 <style>
-    /* Reset básico e box-sizing para melhor responsividade */
-    html {
-        box-sizing: border-box;
-    }
-    *, *::before, *::after {
-        box-sizing: inherit;
-    }
-
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0; background: #f0f2f5; color: #333;
-      display: flex;
-      flex-direction: column; /* Organiza itens em coluna */
-      min-height: 100vh; /* Garante que o body ocupe a altura total da tela */
+      display: flex !important;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header {
       background: #2980b9; color: white; padding: 1rem; text-align: center;
       font-weight: 700; font-size: 1.4rem;
     }
     main {
-      max-width: 900px; /* Largura máxima fixa para evitar redimensionamento */
-      width: 100%; /* Garante que ocupe a largura total dentro do max-width */
-      margin: 1rem auto; /* Centraliza o main */
+      max-width: 900px;
+      width: 100%;
+      margin: 1rem auto;
       background: white; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
       padding: 1rem 2rem 2rem 2rem;
-      flex-grow: 1; /* Garante que o main ocupe o espaço restante */
     }
     nav {
       display: flex; border-bottom: 2px solid #2980b9; margin-bottom: 1rem;
@@ -53,6 +44,7 @@
     }
     textarea, input[type=text] {
       width: 100%; padding: 8px; margin-top: 0.3rem; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem;
+      box-sizing: border-box;
     }
     textarea {
       resize: vertical;
@@ -65,7 +57,7 @@
     }
     button.action-btn {
       background: #2980b9; color: white; border: none; padding: 10px 20px; margin-top: 15px; border-radius: 5px; cursor: pointer;
-      font-weight: 700; margin-right: 10px; /* Espaço entre botões */
+      font-weight: 700; margin-right: 10px;
     }
     button.action-btn:hover {
       background: #1c5d86;
@@ -83,14 +75,13 @@
     th {
       background: #2980b9; color: white;
     }
-    /* Novos estilos para estreitar as colunas de Rodada e Quadra */
     .col-rodada {
-        width: 5%; /* Ajuste conforme necessário, mais estreito */
-        min-width: 40px; /* Garante um tamanho mínimo */
+        width: 10%;
+        min-width: 60px;
     }
     .col-quadra {
-        width: 5%; /* Ajuste conforme necessário, mais estreito */
-        min-width: 40px; /* Garante um tamanho mínimo */
+        width: 10%;
+        min-width: 60px;
     }
 
     input.result-input {
@@ -113,13 +104,55 @@
         margin-top: 15px;
     }
     #quadrasInputContainer label {
-        display: inline-block; /* Para manter o label e o input na mesma linha */
+        display: inline-block;
         margin-right: 10px;
     }
     #quadras {
-        width: auto; /* Ajusta a largura para caber o número */
+        width: auto;
         padding: 5px;
         text-align: center;
+    }
+
+    .popup {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0,0.4);
+        padding-top: 60px;
+    }
+    .popup-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        animation-name: animatetop;
+        animation-duration: 0.4s
+    }
+    @keyframes animatetop {
+        from {top: -300px; opacity: 0}
+        to {top: 0; opacity: 1}
+    }
+    .popup-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .popup-close:hover,
+    .popup-close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
     }
 
     footer {
@@ -127,11 +160,7 @@
         padding: 1rem;
         background: #2980b9;
         color: white;
-        margin-top: auto; /* Empurra o rodapé para baixo */
-    }
-    .footer-text {
-        margin: 0.2rem 0; /* Espaçamento para o texto do rodapé */
-        font-size: 0.9em;
+        margin-top: auto;
     }
 
     .criteria-text {
@@ -144,87 +173,14 @@
         padding-left: 0;
     }
 
-    /* Estilos para o Fieldset de Modo de Jogo */
-    fieldset:has(input[name="modo"]) {
-        display: flex;
-        flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
-        gap: 10px; /* Espaço entre os itens */
-        justify-content: space-between; /* Distribui os itens horizontalmente */
-        align-items: center; /* Centraliza verticalmente */
-    }
-
-    fieldset:has(input[name="modo"]) label {
-        display: flex; /* Para alinhar o rádio e o texto */
-        align-items: center;
-        margin-top: 0; /* Remove margem superior padrão */
-        font-weight: normal; /* Normaliza o peso da fonte */
-        flex-basis: calc(50% - 5px); /* Duas colunas por padrão */
-    }
-
-    fieldset:has(input[name="modo"]) input[type="radio"] {
-        margin-right: 5px; /* Espaço entre o rádio e o texto */
-    }
-
-    /* Mensagens na página */
-    .in-page-message {
-        background-color: #e7f3fe; /* Light blue background */
-        border-left: 6px solid #2196F3; /* Blue border */
-        margin-top: 1rem;
-        padding: 10px 15px;
-        color: #0c5460; /* Darker blue text */
-        border-radius: 4px;
-        font-size: 0.95em;
-        text-align: center;
-    }
-    .in-page-message.error {
-        background-color: #f8d7da; /* Light red background */
-        border-left: 6px solid #dc3545; /* Red border */
-        color: #721c24; /* Darker red text */
-    }
-
-    /* Media Queries para responsividade */
-    @media (max-width: 768px) { /* Tablets e telas menores */
-        main {
-            padding: 1rem 1.5rem; /* Ajusta padding para telas um pouco menores */
-        }
-        nav button {
-            font-size: 0.9rem;
-            padding: 0.8rem;
-        }
-        fieldset:has(input[name="modo"]) label {
-            flex-basis: 100%; /* Uma coluna em telas menores */
-        }
-    }
-
-    @media (max-width: 600px) { /* Smartphones */
-        main {
-            margin: 0.5rem auto;
-            padding: 1rem; /* Mais ajuste de padding para telas pequenas */
-        }
-        header {
-            font-size: 1.2rem;
-            padding: 0.8rem;
-        }
-        nav button {
-            font-size: 0.8rem;
-            padding: 0.6rem;
-        }
-        table, th, td {
-            font-size: 0.75rem; /* Reduz a fonte da tabela */
-            padding: 6px;
-        }
-        input.result-input {
-            width: 40px; /* Reduz largura dos inputs de resultado */
-            font-size: 0.8rem;
-        }
-        button.action-btn {
-            padding: 8px 15px;
-            font-size: 0.9rem;
-        }
-        /* Ajuste para que o texto do label não quebre tão cedo no modo de jogo */
-        fieldset:has(input[name="modo"]) label {
-             font-size: 0.9rem; /* Reduz a fonte do texto do rádio */
-        }
+    @media (max-width: 600px) {
+      nav button {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
+      table, th, td {
+        font-size: 0.8rem;
+      }
     }
 </style>
 </head>
@@ -250,15 +206,28 @@
 
         <div id="campoSemPote">
             <label for="jogadores">Jogadores (um por linha):</label>
-            <textarea id="jogadores" rows="8" placeholder="Exemplo: Lucas&#10;Maria&#10;Pedro&#10;Ana"></textarea>
+            <textarea id="jogadores" rows="8" placeholder="Exemplo: Lucas&#10;Maria&#10;Pedro&#10;Ana">Lucas
+Maria
+Pedro
+Ana
+João
+Carla
+Paulo
+Marina</textarea>
         </div>
 
         <div id="campoComPote" style="display:none;">
             <label for="pote1">Pote 1 (um por linha):</label>
-            <textarea id="pote1" rows="6" placeholder="Exemplo: Lucas&#10;Pedro&#10;João&#10;Paulo"></textarea>
+            <textarea id="pote1" rows="6" placeholder="Exemplo: Lucas&#10;Pedro&#10;João&#10;Paulo">A
+B
+C
+D</textarea>
 
             <label for="pote2">Pote 2 (um por linha):</label>
-            <textarea id="pote2" rows="6" placeholder="Exemplo: Maria&#10;Ana&#10;Carla&#10;Marina"></textarea>
+            <textarea id="pote2" rows="6" placeholder="Exemplo: Maria&#10;Ana&#10;Carla&#10;Marina">1
+2
+3
+4</textarea>
             <div id="poteOptions" style="display:none;">
                 <p>Os potes têm números de jogadores diferentes. Escolha uma opção:</p>
                 <div class="option-buttons">
@@ -274,6 +243,8 @@
             <input type="number" id="quadras" value="1" min="1">
             <span id="quadrasInfo" style="font-size: 0.9em; color: #555;"></span>
         </div>
+        
+        <div id="sortResultInfo" style="margin-top: 1rem; font-weight: bold; color: green;"></div>
 
         <button class="action-btn" id="btnSortear">Sortear Jogos</button>
         <button class="action-btn" id="btnReiniciar">Reiniciar</button>
@@ -293,7 +264,6 @@
             <tbody>
                 </tbody>
         </table>
-        <div id="gameCreationMessage" class="in-page-message" style="display: none;"></div>
     </section>
 
     <section id="resultado">
@@ -312,7 +282,6 @@
             <tbody>
                 </tbody>
         </table>
-        <div id="championMessage" class="in-page-message" style="display: none;"></div>
         <p class="criteria-text">
             **Critérios de Desempate:**
             <ol class="criteria-list">
@@ -321,14 +290,22 @@
                 <li>Em caso de novo empate, o critério é o **Confronto Direto** (quem ganhou o jogo entre os empatados)</li>
             </ol>
         </p>
+        <div id="championInfoDiv" style="margin-top: 1.5rem; font-size: 1.1em; text-align: center; font-weight: bold; color: #2980b9;"></div>
     </section>
 </main>
 
 <footer>
-    <div class="footer-text">© 2025 Todos os direitos reservados. Proibida a cópia ou reprodução.</div>
-    <div class="footer-text">Desenvolvido por Lauro Licce.</div>
-    <div class="footer-text">v1.0.1</div>
+    © 2025 Todos os direitos reservados. Proibida a cópia ou reprodução.<br>
+    Desenvolvido por Lauro Licce.
 </footer>
+
+<div id="infoPopup" class="popup">
+    <div class="popup-content">
+        <span class="popup-close">&times;</span>
+        <h3 id="popupTitle"></h3>
+        <p id="popupMessage"></p>
+    </div>
+</div>
 
 <script>
     // Gerenciamento de abas
@@ -344,13 +321,9 @@
                 if (section.id === targetTab) section.classList.add('active');
                 else section.classList.remove('active');
             });
-            // Quando muda para a aba de resultado, atualiza a classificação e mostra a mensagem do campeão
+            // Quando muda para a aba de resultado, atualiza a classificação (sem mostrar pop-up de campeão)
             if (targetTab === 'resultado') {
-                updateClassification(true); // true para indicar que é uma atualização de tab
-            } else {
-                // Esconde as mensagens ao trocar de aba
-                displayMessage('gameCreationMessage', '', false);
-                displayMessage('championMessage', '', false);
+                updateClassification(); // showChampionPopup is now handled internally without a parameter
             }
         });
     });
@@ -367,24 +340,28 @@
     const pote2TextArea = document.getElementById('pote2');
     const tabelaJogosBody = document.querySelector('#tabelaJogos tbody');
     const tabelaResultadoBody = document.querySelector('#tabelaResultado tbody');
-    const headerName = document.getElementById('headerName'); // Cabeçalho dinâmico
+    const headerName = document.getElementById('headerName');
     const quadrasInput = document.getElementById('quadras');
     const quadrasInfoSpan = document.getElementById('quadrasInfo');
+    const infoPopup = document.getElementById('infoPopup');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupMessage = document.getElementById('popupMessage');
+    const popupClose = document.querySelector('.popup-close');
     const btnSortear = document.getElementById('btnSortear');
     const btnReiniciar = document.getElementById('btnReiniciar');
-    const gameCreationMessageDiv = document.getElementById('gameCreationMessage');
-    const championMessageDiv = document.getElementById('championMessage');
+    const championInfoDiv = document.getElementById('championInfoDiv'); // Novo div para info do campeão
+    const sortResultInfo = document.getElementById('sortResultInfo'); // Novo div para info do sorteio
 
     // Estado global da aplicação
     let generatedGames = [];
-    let currentMode = 'individual-sem-pote'; // Modo de jogo inicial
-    let fixedDuosMap = {}; // Armazenará as duplas fixas para o torneio
+    let currentMode = 'individual-sem-pote';
+    let fixedDuosMap = {};
 
     // Constantes para chaves do localStorage
     const LOCAL_STORAGE_KEY_GAMES = 'super8_generatedGames';
     const LOCAL_STORAGE_KEY_CONFIG = 'super8_config';
     const LOCAL_STORAGE_KEY_MODE_LOCKED = 'super8_modeLocked';
-    const LOCAL_STORAGE_KEY_FIXED_DUOS = 'super8_fixedDuos'; // Nova chave para duplas fixas
+    const LOCAL_STORAGE_KEY_FIXED_DUOS = 'super8_fixedDuos';
 
     // Event listener para mudança de modo de jogo
     radiosModo.forEach(radio => radio.addEventListener('change', () => {
@@ -396,11 +373,9 @@
             campoComPote.style.display = 'none';
             campoSemPote.style.display = 'block';
         }
-        // Limpa opções de pote e informações de jogador ao mudar o modo
         poteOptionsDiv.style.display = 'none';
         playerActionInfoDiv.style.display = 'none';
-        // Não reseta o localStorage aqui, apenas ao clicar em "Reiniciar"
-        updateQuadrasInputLimits(); // Atualiza limites de quadras ao mudar o modo/jogadores
+        updateQuadrasInputLimits();
     }));
 
     // Event listener para input de jogadores/potes para atualizar limites de quadra
@@ -408,33 +383,25 @@
     pote1TextArea.addEventListener('input', updateQuadrasInputLimits);
     pote2TextArea.addEventListener('input', updateQuadrasInputLimits);
 
-    /**
-     * Exibe uma mensagem na página em um div específico.
-     * @param {string} elementId - O ID do elemento div onde a mensagem será exibida.
-     * @param {string} message - A mensagem a ser exibida.
-     * @param {boolean} show - True para mostrar, false para esconder.
-     * @param {boolean} isError - True se for uma mensagem de erro (para estilização).
-     */
-    function displayMessage(elementId, message, show, isError = false) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = message;
-            element.style.display = show ? 'block' : 'none';
-            if (isError) {
-                element.classList.add('error');
-            } else {
-                element.classList.remove('error');
-            }
+    // Event listener para fechar o pop-up
+    popupClose.addEventListener('click', () => {
+        infoPopup.style.display = 'none';
+    });
+    window.addEventListener('click', (event) => {
+        if (event.target == infoPopup) {
+            infoPopup.style.display = 'none';
         }
-    }
+    });
 
     /**
-     * Exibe um pop-up de alerta para mensagens de sucesso ou confirmação.
-     * @param {string} title - Título do pop-up.
-     * @param {string} message - Mensagem a ser exibida no pop-up.
+     * Exibe o pop-up com um título e mensagem.
+     * @param {string} title - O título do pop-up.
+     * @param {string} message - A mensagem a ser exibida no pop-up.
      */
     function showPopup(title, message) {
-        alert(`${title}\n\n${message}`);
+        popupTitle.textContent = title;
+        popupMessage.innerHTML = message;
+        infoPopup.style.display = 'block';
     }
 
     /**
@@ -468,33 +435,12 @@
         const modeLocked = localStorage.getItem(LOCAL_STORAGE_KEY_MODE_LOCKED) === 'true';
         const savedFixedDuos = localStorage.getItem(LOCAL_STORAGE_KEY_FIXED_DUOS);
 
-        if (savedGames) {
-            generatedGames = JSON.parse(savedGames);
-            displayGames(generatedGames);
-            setConfigurationFieldsDisabled(true); // Desabilita campos se jogos já foram gerados
-            // Trava os radios de modo se os jogos já foram sorteados
-            radiosModo.forEach(radio => radio.disabled = modeLocked);
-            // Ativa a aba "Jogos" se houver jogos salvos
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            document.querySelector('button[data-tab="jogos"]').classList.add('active');
-            sections.forEach(sec => {
-                if (sec.id === 'jogos') sec.classList.add('active');
-                else sec.classList.remove('active');
-            });
-        }
-
         if (savedConfig) {
             const config = JSON.parse(savedConfig);
             currentMode = config.mode;
-            jogadoresTextArea.value = config.jogadores;
-            pote1TextArea.value = config.pote1;
-            pote2TextArea.value = config.pote2;
-            quadrasInput.value = config.quadras;
-
-            // Define o radio button do modo de jogo
+            
             document.querySelector(`input[name="modo"][value="${currentMode}"]`).checked = true;
 
-            // Mostra/esconde campos de pote
             if (currentMode.includes('com-pote')) {
                 campoComPote.style.display = 'block';
                 campoSemPote.style.display = 'none';
@@ -502,19 +448,129 @@
                 campoComPote.style.display = 'none';
                 campoSemPote.style.display = 'block';
             }
+
+            jogadoresTextArea.value = config.jogadores || 'Lucas\nMaria\nPedro\nAna\nJoão\nCarla\nPaulo\nMarina';
+            pote1TextArea.value = config.pote1 || 'A\nB\nC\nD';
+            pote2TextArea.value = config.pote2 || '1\n2\n3\n4';
+            quadrasInput.value = config.quadras || 1;
+        } else {
+            resetApplicationState(false); 
         }
 
         if (savedFixedDuos) {
             fixedDuosMap = JSON.parse(savedFixedDuos);
         }
 
-        updateQuadrasInputLimits(); // Garante que os limites do input de quadras estejam corretos após o carregamento
-        updateClassification(false); // Atualiza a classificação ao carregar, mas sem mostrar o pop-up de campeão
+        if (savedGames) {
+            generatedGames = JSON.parse(savedGames);
+            displayGames(generatedGames);
+            updateClassification();
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('button[data-tab="jogos"]').classList.add('active');
+            sections.forEach(sec => {
+                if (sec.id === 'jogos') sec.classList.add('active');
+                else sec.classList.remove('active');
+            });
+            setConfigurationFieldsDisabled(true); 
+            radiosModo.forEach(radio => radio.disabled = modeLocked);
+            sortResultInfo.textContent = 'Os jogos foram criados com sucesso!'; // Restore success message
+
+        } else {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('button[data-tab="config"]').classList.add('active');
+            sections.forEach(sec => {
+                if (sec.id === 'config') sec.classList.add('active');
+                else sec.classList.remove('active');
+            });
+            setConfigurationFieldsDisabled(false);
+            radiosModo.forEach(radio => radio.disabled = false);
+            sortResultInfo.textContent = ''; // Clear message if no games are loaded
+        }
+        updateQuadrasInputLimits(); 
     }
 
     /**
-     * Desabilita ou habilita os campos de configuração.
-     * @param {boolean} disabled - True para desabilitar, false para habilitar.
+     * Embaralha um array (Fisher-Yates shuffle).
+     * @param {Array} array - O array a ser embaralhado.
+     */
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    /**
+     * Normaliza a entrada de texto de jogadores/potes para um array limpo de strings.
+     * Remove espaços em branco extras e linhas vazias.
+     * @param {string} text - O texto de entrada do textarea.
+     * @returns {Array<string>} Um array de nomes de jogadores.
+     */
+    function parsePlayerInput(text) {
+        return text.split('\n')
+                   .map(player => player.trim())
+                   .filter(player => player !== '');
+    }
+
+    /**
+     * Calcula o número máximo de quadras com base no número de jogadores.
+     * 1 quadra para cada 4 jogadores (ou 2 duplas), arredondado para baixo.
+     * @param {number} numPlayers - O número total de jogadores.
+     * @param {string} mode - O modo de jogo ('individual' ou 'dupla').
+     * @returns {number} O número máximo de quadras.
+     */
+    function calculateMaxQuadras(numPlayers, mode) {
+        if (mode === 'dupla') {
+            return Math.floor(numPlayers / 2);
+        } else {
+            return Math.floor(numPlayers / 4);
+        }
+    }
+
+    /**
+     * Atualiza os limites (min/max) do input de quadras e exibe uma mensagem.
+     */
+    function updateQuadrasInputLimits() {
+        let playersCount = 0;
+        let modeForCalculation = 'individual'; 
+
+        if (currentMode.includes('com-pote')) {
+            const pote1 = parsePlayerInput(pote1TextArea.value);
+            const pote2 = parsePlayerInput(pote2TextArea.value);
+            
+            if (currentMode.startsWith('dupla-fixa')) {
+                modeForCalculation = 'dupla';
+                // Para duplas fixas com pote, o número de "duplas" é o tamanho do menor pote.
+                // Cada dupla ocupa 2 "slots" em uma partida de 4 pessoas.
+                // Então, o número de "players" para cálculo do maxQuadras é o dobro do número de duplas.
+                playersCount = Math.min(pote1.length, pote2.length) * 2; 
+            } else {
+                playersCount = pote1.length + pote2.length;
+            }
+        } else {
+            const players = parsePlayerInput(jogadoresTextArea.value);
+            playersCount = players.length;
+            if (currentMode.startsWith('dupla-fixa')) {
+                modeForCalculation = 'dupla';
+                playersCount = Math.ceil(players.length / 2) * 2; // Representa o número de "jogadores" se fossem duplas fixas
+            }
+        }
+        
+        const maxQuadras = calculateMaxQuadras(playersCount, modeForCalculation);
+        
+        quadrasInput.min = 1;
+        quadrasInput.max = Math.max(1, maxQuadras); 
+
+        quadrasInfoSpan.textContent = `(Máximo ${quadrasInput.max} quadra${quadrasInput.max > 1 ? 's' : ''})`;
+
+        if (parseInt(quadrasInput.value) > quadrasInput.max) {
+            quadrasInput.value = quadrasInput.max;
+        }
+    }
+
+    /**
+     * Habilita ou desabilita os campos de configuração.
+     * @param {boolean} disabled - True para desabilitar, False para habilitar.
      */
     function setConfigurationFieldsDisabled(disabled) {
         jogadoresTextArea.disabled = disabled;
@@ -522,689 +578,1079 @@
         pote2TextArea.disabled = disabled;
         quadrasInput.disabled = disabled;
         btnSortear.disabled = disabled;
-        document.getElementById('btnExcludePlayer').disabled = disabled;
-        document.getElementById('btnMovePlayer').disabled = disabled; // Também desabilita o botão de mover
-        // NÂO desabilita radios de modo aqui, eles são controlados por LOCAL_STORAGE_KEY_MODE_LOCKED
-    }
-
-    /**
-     * Limpa o localStorage e reseta o estado da aplicação.
-     * @param {boolean} confirmReset - Se true, pede confirmação ao usuário.
-     */
-    function resetApplicationState(confirmReset = false) {
-        if (confirmReset && !confirm('Tem certeza que deseja reiniciar e apagar todas as informações?')) {
-            return;
-        }
-
-        localStorage.removeItem(LOCAL_STORAGE_KEY_GAMES);
-        localStorage.removeItem(LOCAL_STORAGE_KEY_CONFIG);
-        localStorage.removeItem(LOCAL_STORAGE_KEY_MODE_LOCKED);
-        localStorage.removeItem(LOCAL_STORAGE_KEY_FIXED_DUOS); // Limpa duplas fixas
-
-        generatedGames = [];
-        fixedDuosMap = {}; // Reseta o mapa de duplas fixas
-        tabelaJogosBody.innerHTML = '';
-        tabelaResultadoBody.innerHTML = '';
-        jogadoresTextArea.value = '';
-        pote1TextArea.value = '';
-        pote2TextArea.value = '';
-        quadrasInput.value = '1'; // Reseta para o valor padrão
-        currentMode = 'individual-sem-pote';
-        document.querySelector(`input[name="modo"][value="individual-sem-pote"]`).checked = true;
-        campoComPote.style.display = 'none';
-        campoSemPote.style.display = 'block';
-        poteOptionsDiv.style.display = 'none';
-        playerActionInfoDiv.style.display = 'none';
-
-        setConfigurationFieldsDisabled(false); // Habilita campos
-        radiosModo.forEach(radio => radio.disabled = false); // Habilita radios
-
-        displayMessage('gameCreationMessage', '', false); // Esconde mensagens
-        displayMessage('championMessage', '', false); // Esconde mensagens
-
-        updateQuadrasInputLimits(); // Atualiza os limites de quadra
-        updateClassification(false); // Limpa a tabela de classificação
-    }
-
-
-    /**
-     * Atualiza os limites mínimo e máximo do input de quadras e a mensagem informativa.
-     */
-    function updateQuadrasInputLimits() {
-        let players = [];
-        if (currentMode.includes('sem-pote')) {
-            players = jogadoresTextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-        } else {
-            const pote1Players = pote1TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-            const pote2Players = pote2TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-            players = [...pote1Players, ...pote2Players];
-        }
-
-        const numPlayers = players.length;
-        const numGamesPerRound = Math.floor(numPlayers / 4); // Cada jogo tem 4 jogadores (2 duplas)
-        const minQuadras = 1; // Mínimo de 1 quadra
-        const maxQuadras = numGamesPerRound > 0 ? numGamesPerRound : 1; // Se não houver jogadores suficientes para um jogo, 1 quadra é o máximo
-
-        quadrasInput.min = minQuadras;
-        quadrasInput.max = maxQuadras;
-
-        if (parseInt(quadrasInput.value) > maxQuadras) {
-            quadrasInput.value = maxQuadras;
-        }
-        if (parseInt(quadrasInput.value) < minQuadras) {
-            quadrasInput.value = minQuadras;
-        }
-
-        if (numPlayers < 4) {
-            quadrasInfoSpan.textContent = `São necessários pelo menos 4 jogadores para gerar jogos. (Jogadores atuais: ${numPlayers})`;
-            btnSortear.disabled = true; // Desabilita o botão se não houver jogadores suficientes
-        } else {
-            quadrasInfoSpan.textContent = `Número máximo de jogos simultâneos por rodada: ${maxQuadras}`;
-            btnSortear.disabled = false; // Habilita se houver jogadores suficientes
+        
+        if (disabled) {
+            poteOptionsDiv.style.display = 'none';
         }
     }
 
+    // --- Funções de Geração de Jogos ---
 
     /**
-     * Gera jogos para o modo "Individual sem pote".
-     * @param {Array<string>} players - Lista de jogadores.
-     * @param {number} numQuadras - Número de quadras disponíveis.
-     * @returns {Array<Object>} Lista de objetos de jogos.
+     * Gera todos os jogos possíveis para o modo "Individual sem Pote" usando Round-Robin
+     * e os distribui sequencialmente pelas quadras disponíveis.
+     * Garante que todos os jogos sejam gerados, independentemente do número de quadras,
+     * e os atribui a rodadas e quadras de forma sequential.
+     * @param {Array<string>} players - Lista de nomes dos jogadores.
+     * @returns {Array<Object>} Lista de jogos gerados com rodada e quadra atribuídas.
      */
-    function generateGamesIndividualNoPot(players, numQuadras) {
-        let games = [];
-        let roundCounter = 1;
-        let availablePlayers = [...players]; // Copia para embaralhar e manipular
+    function generateGamesIndividualNoPot(players) {
+        let allPlayers = [...players];
+        const n = allPlayers.length;
 
-        // Embaralha os jogadores
-        for (let i = availablePlayers.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [availablePlayers[i], availablePlayers[j]] = [availablePlayers[j], availablePlayers[i]];
-        }
-
-        // Gera jogos até que não seja possível formar mais 4 jogadores
-        while (availablePlayers.length >= 4) {
-            let playersInThisRound = [...availablePlayers];
-            let currentRoundGames = [];
-            let quadraCounter = 1;
-
-            while (playersInThisRound.length >= 4 && quadraCounter <= numQuadras) {
-                // Seleciona 4 jogadores aleatoriamente
-                let selectedForGame = [];
-                for (let i = 0; i < 4; i++) {
-                    const randomIndex = Math.floor(Math.random() * playersInThisRound.length);
-                    selectedForGame.push(playersInThisRound[randomIndex]);
-                    playersInThisRound.splice(randomIndex, 1); // Remove o jogador selecionado
-                }
-
-                // Forma as duplas aleatoriamente dentro dos 4 selecionados
-                selectedForGame = shuffleArray(selectedForGame); // Embaralha para formar duplas A e B
-                const duplaA = [selectedForGame[0], selectedForGame[1]].sort();
-                const duplaB = [selectedForGame[2], selectedForGame[3]].sort();
-
-                currentRoundGames.push({
-                    round: roundCounter,
-                    court: quadraCounter,
-                    duplaA: duplaA,
-                    duplaB: duplaB,
-                    players: [...duplaA, ...duplaB], // Todos os jogadores no jogo
-                    gamesDuplaA: 0, // Inicializa com 0
-                    gamesDuplaB: 0  // Inicializa com 0
-                });
-                quadraCounter++;
-            }
-            games = games.concat(currentRoundGames);
-            // Remove os jogadores que participaram desta rodada da lista geral de disponíveis
-            // Isso garante que cada jogador jogue o máximo de vezes possível em diferentes combinações
-            availablePlayers = availablePlayers.filter(p => !currentRoundGames.some(game => game.players.includes(p)));
-            roundCounter++;
-        }
-
-        return games;
-    }
-
-
-    /**
-     * Gera jogos para o modo "Individual com pote".
-     * @param {Array<string>} pote1 - Jogadores do pote 1.
-     * @param {Array<string>} pote2 - Jogadores do pote 2.
-     * @param {number} numQuadras - Número de quadras disponíveis.
-     * @returns {Array<Object>} Lista de objetos de jogos.
-     */
-    function generateGamesIndividualWithPot(pote1, pote2, numQuadras) {
-        let games = [];
-        let roundCounter = 1;
-
-        if (pote1.length !== pote2.length) {
-            displayMessage('gameCreationMessage', 'Os potes têm números de jogadores diferentes. Por favor, ajuste.', true, true);
-            // Força a exibição do popup de opções
-            poteOptionsDiv.style.display = 'block';
-            const diff = Math.abs(pote1.length - pote2.length);
-            const largerPote = pote1.length > pote2.length ? 'Pote 1' : 'Pote 2';
-            playerActionInfoDiv.textContent = `A diferença é de ${diff} jogador(es). O ${largerPote} tem mais jogadores.`;
-            playerActionInfoDiv.style.display = 'block';
-            return []; // Retorna array vazio para não gerar jogos
-        }
-
-        let availablePote1 = shuffleArray([...pote1]);
-        let availablePote2 = shuffleArray([...pote2]);
-
-        // O loop continuará enquanto houver jogadores suficientes para pelo menos um jogo
-        while (availablePote1.length >= 2 && availablePote2.length >= 2) {
-            let currentRoundGames = [];
-            let quadraCounter = 1;
-
-            // Gera jogos para esta rodada, usando os jogadores atualmente disponíveis
-            while (availablePote1.length >= 2 && availablePote2.length >= 2 && quadraCounter <= numQuadras) {
-                const selectedP1 = availablePote1.splice(0, 2); // Pega 2 jogadores do pote 1
-                const selectedP2 = availablePote2.splice(0, 2); // Pega 2 jogadores do pote 2
-
-                // Forma duplas mistas (1 P1 + 1 P2)
-                const dupla1 = [selectedP1[0], selectedP2[0]].sort();
-                const dupla2 = [selectedP1[1], selectedP2[1]].sort();
-
-                currentRoundGames.push({
-                    round: roundCounter,
-                    court: quadraCounter,
-                    duplaA: dupla1,
-                    duplaB: dupla2,
-                    players: [...dupla1, ...dupla2],
-                    gamesDuplaA: 0,
-                    gamesDuplaB: 0
-                });
-                quadraCounter++;
-            }
-
-            // Se jogos foram formados nesta rodada, adiciona-os e incrementa o contador de rodadas
-            if (currentRoundGames.length > 0) {
-                games = games.concat(currentRoundGames);
-                roundCounter++;
-            } else {
-                // Se nenhum jogo foi formado nesta rodada (e ainda há jogadores nos potes),
-                // significa que não é mais possível formar jogos com os pares restantes.
-                break;
-            }
-            // Não há mais recarga infinita dos potes, o loop terminará quando availablePote1 ou availablePote2 esvaziarem.
-        }
-        return games;
-    }
-
-    /**
-     * Gera jogos para o modo "Dupla Fixa sem pote".
-     * @param {Array<string>} players - Lista de jogadores.
-     * @param {number} numQuadras - Número de quadras disponíveis.
-     * @returns {Array<Object>} Lista de objetos de jogos.
-     */
-    function generateGamesDuplaFixaNoPot(players, numQuadras) {
-        let games = [];
-        fixedDuosMap = {}; // Reinicia o mapa de duplas fixas
-
-        if (players.length % 2 !== 0) {
-            displayMessage('gameCreationMessage', 'Para dupla fixa, o número de jogadores deve ser par. Por favor, ajuste.', true, true);
+        if (n < 4) {
+            alert("Para o modo 'Individual sem pote', você precisa de pelo menos 4 jogadores para formar duplas.");
             return [];
         }
 
-        // Forma duplas aleatoriamente
-        let shuffledPlayers = shuffleArray([...players]);
-        let duplas = [];
-        for (let i = 0; i < shuffledPlayers.length; i += 2) {
-            const dupla = [shuffledPlayers[i], shuffledPlayers[i + 1]].sort().join(' & ');
-            duplas.push(dupla);
-            fixedDuosMap[dupla] = [shuffledPlayers[i], shuffledPlayers[i + 1]]; // Salva a composição da dupla
+        let tempPlayers = [...allPlayers];
+        let effectiveN = n;
+        
+        if (effectiveN % 2 !== 0) {
+            tempPlayers.push('Livre');
+            effectiveN++;
         }
 
-        // Agora, gerar jogos entre as duplas
-        let roundCounter = 1;
-        let availableDuplas = [...duplas]; // Duplas disponíveis para a geração
+        const numRoundsTheoretical = effectiveN - 1;
+        let allPotentialGames = [];
 
-        // O loop continua enquanto houver duplas suficientes para pelo menos um jogo
-        while (availableDuplas.length >= 2) { // Mínimo de 2 duplas para um jogo (A vs B)
-            let currentRoundGames = [];
-            let quadraCounter = 1;
+        for (let r = 0; r < numRoundsTheoretical; r++) {
+            let roundDuos = [];
+            const fixedPlayer = tempPlayers[0];
+            const rotatingPlayers = tempPlayers.slice(1);
 
-            // Gera jogos para esta rodada
-            while (availableDuplas.length >= 2 && quadraCounter <= numQuadras) {
-                let selectedForGame = []; // Seleciona 2 duplas para um jogo
-                const randomIndex1 = Math.floor(Math.random() * availableDuplas.length);
-                selectedForGame.push(availableDuplas[randomIndex1]);
-                availableDuplas.splice(randomIndex1, 1);
-
-                const randomIndex2 = Math.floor(Math.random() * availableDuplas.length);
-                selectedForGame.push(availableDuplas[randomIndex2]);
-                availableDuplas.splice(randomIndex2, 1);
-
-                const duplaA = selectedForGame[0];
-                const duplaB = selectedForGame[1];
-
-                currentRoundGames.push({
-                    round: roundCounter,
-                    court: quadraCounter,
-                    duplaA: duplaA,
-                    duplaB: duplaB,
-                    players: [...fixedDuosMap[duplaA], ...fixedDuosMap[duplaB]], // Os 4 jogadores reais
-                    gamesDuplaA: 0,
-                    gamesDuplaB: 0
-                });
-                quadraCounter++;
-            }
-
-            if (currentRoundGames.length > 0) {
-                games = games.concat(currentRoundGames);
-                roundCounter++;
-            } else {
-                break; // Não foi possível formar mais jogos
-            }
-            // O loop terminará quando availableDuplas esvaziar
-        }
-        return games;
-    }
-
-    /**
-     * Gera jogos para o modo "Dupla Fixa com pote".
-     * @param {Array<string>} pote1 - Jogadores do pote 1.
-     * @param {Array<string>} pote2 - Jogadores do pote 2.
-     * @param {number} numQuadras - Número de quadras disponíveis.
-     * @returns {Array<Object>} Lista de objetos de jogos.
-     */
-    function generateGamesDuplaFixaWithPot(pote1, pote2, numQuadras) {
-        let games = [];
-        fixedDuosMap = {}; // Reinicia o mapa de duplas fixas
-
-        if (pote1.length !== pote2.length || pote1.length % 2 !== 0) {
-            displayMessage('gameCreationMessage', 'Para dupla fixa com pote, os potes devem ter o mesmo número de jogadores, e o número de jogadores em cada pote deve ser par. Por favor, ajuste.', true, true);
-            return [];
-        }
-
-        // Forma duplas fixas com 1 P1 e 1 P2
-        let shuffledP1 = shuffleArray([...pote1]);
-        let shuffledP2 = shuffleArray([...pote2]);
-        let duplas = [];
-        for (let i = 0; i < shuffledP1.length; i++) {
-            const dupla = [shuffledP1[i], shuffledP2[i]].sort().join(' & ');
-            duplas.push(dupla);
-            fixedDuosMap[dupla] = [shuffledP1[i], shuffledP2[i]];
-        }
-
-        // Agora, gerar jogos entre as duplas formadas
-        let roundCounter = 1;
-        let availableDuplas = [...duplas]; // Duplas disponíveis para a geração
-
-        // O loop continua enquanto houver duplas suficientes para pelo menos um jogo
-        while (availableDuplas.length >= 2) { // Mínimo de 2 duplas para um jogo (A vs B)
-            let currentRoundGames = [];
-            let quadraCounter = 1;
-
-            // Gera jogos para esta rodada
-            while (availableDuplas.length >= 2 && quadraCounter <= numQuadras) {
-                let selectedForGame = []; // Seleciona 2 duplas para um jogo
-                const randomIndex1 = Math.floor(Math.random() * availableDuplas.length);
-                selectedForGame.push(availableDuplas[randomIndex1]);
-                availableDuplas.splice(randomIndex1, 1);
-
-                const randomIndex2 = Math.floor(Math.random() * availableDuplas.length);
-                selectedForGame.push(availableDuplas[randomIndex2]);
-                availableDuplas.splice(randomIndex2, 1);
-
-                const duplaA = selectedForGame[0];
-                const duplaB = selectedForGame[1];
-
-                currentRoundGames.push({
-                    round: roundCounter,
-                    court: quadraCounter,
-                    duplaA: duplaA,
-                    duplaB: duplaB,
-                    players: [...fixedDuosMap[duplaA], ...fixedDuosMap[duplaB]],
-                    gamesDuplaA: 0,
-                    gamesDuplaB: 0
-                });
-                quadraCounter++;
-            }
-
-            if (currentRoundGames.length > 0) {
-                games = games.concat(currentRoundGames);
-                roundCounter++;
-            } else {
-                break; // Não foi possível formar mais jogos
-            }
-            // O loop terminará quando availableDuplas esvaziar
-        }
-        return games;
-    }
-
-
-    /**
-     * Função auxiliar para embaralhar um array (Fisher-Yates).
-     * @param {Array} array - O array a ser embaralhado.
-     * @returns {Array} O array embaralhado.
-     */
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    /**
-     * Exibe os jogos na tabela.
-     * @param {Array<Object>} games - Lista de objetos de jogos.
-     */
-    function displayGames(games) {
-        tabelaJogosBody.innerHTML = ''; // Limpa a tabela existente
-        games.forEach((game, index) => {
-            const row = tabelaJogosBody.insertRow();
-            row.dataset.gameIndex = index; // Armazena o índice do jogo na linha
-
-            const cellRound = row.insertCell();
-            cellRound.classList.add('col-rodada');
-            cellRound.textContent = game.round;
-
-            const cellCourt = row.insertCell();
-            cellCourt.classList.add('col-quadra');
-            cellCourt.textContent = game.court;
-
-            const cellDuplaA = row.insertCell();
-            cellDuplaA.textContent = Array.isArray(game.duplaA) ? game.duplaA.join(' & ') : game.duplaA;
-
-            const cellResult = row.insertCell();
-            cellResult.classList.add('center');
-            const inputA = document.createElement('input');
-            inputA.type = 'number';
-            inputA.min = '0';
-            inputA.value = game.gamesDuplaA;
-            inputA.classList.add('result-input');
-            inputA.addEventListener('change', (e) => updateResult(index, 'A', e.target.value));
-
-            const separator = document.createTextNode(' x ');
-
-            const inputB = document.createElement('input');
-            inputB.type = 'number';
-            inputB.min = '0';
-            inputB.value = game.gamesDuplaB;
-            inputB.classList.add('result-input');
-            inputB.addEventListener('change', (e) => updateResult(index, 'B', e.target.value));
-
-            cellResult.appendChild(inputA);
-            cellResult.appendChild(separator);
-            cellResult.appendChild(inputB);
-
-            const cellDuplaB = row.insertCell();
-            cellDuplaB.textContent = Array.isArray(game.duplaB) ? game.duplaB.join(' & ') : game.duplaB;
-        });
-    }
-
-    /**
-     * Atualiza o resultado de um jogo e salva no localStorage.
-     * @param {number} gameIndex - Índice do jogo no array `generatedGames`.
-     * @param {string} team - 'A' ou 'B' para indicar qual time teve o resultado atualizado.
-     * @param {string} value - O novo valor do resultado (string do input).
-     */
-    function updateResult(gameIndex, team, value) {
-        const parsedValue = parseInt(value);
-        if (isNaN(parsedValue) || parsedValue < 0) {
-            // Reverter para o valor anterior ou 0 se a entrada for inválida
-            if (team === 'A') {
-                document.querySelector(`tr[data-game-index="${gameIndex}"] input:first-of-type`).value = generatedGames[gameIndex].gamesDuplaA;
-            } else {
-                document.querySelector(`tr[data-game-index="${gameIndex}"] input:last-of-type`).value = generatedGames[gameIndex].gamesDuplaB;
-            }
-            displayMessage('gameCreationMessage', 'Por favor, insira apenas números positivos nos resultados.', true, true);
-            return;
-        }
-
-        if (team === 'A') {
-            generatedGames[gameIndex].gamesDuplaA = parsedValue;
-        } else {
-            generatedGames[gameIndex].gamesDuplaB = parsedValue;
-        }
-        saveGameState();
-        updateClassification(false); // Atualiza a classificação, mas não mostra o pop-up de campeão
-    }
-
-
-    /**
-     * Atualiza a classificação dos jogadores ou duplas.
-     * @param {boolean} showChampionPopup - Se true, mostra a mensagem do campeão após a atualização.
-     */
-    function updateClassification(showChampionPopup) {
-        let playerStats = {};
-        let allPlayers = []; // Lista de todos os jogadores (ou duplas, se for modo dupla fixa)
-
-        if (currentMode.includes('sem-pote')) {
-            allPlayers = jogadoresTextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-            headerName.textContent = 'Jogador';
-        } else if (currentMode.includes('com-pote')) {
-            const pote1Players = pote1TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-            const pote2Players = pote2TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-            allPlayers = [...pote1Players, ...pote2Players];
-            headerName.textContent = 'Jogador';
-        } else if (currentMode.includes('dupla-fixa')) {
-            // Para duplas fixas, as "entidades" na classificação são as duplas (nomes concatenados)
-            allPlayers = Object.keys(fixedDuosMap);
-            headerName.textContent = 'Dupla';
-        }
-
-        // Inicializa as estatísticas para todos os jogadores/duplas
-        for (const player of allPlayers) {
-            playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-        }
-
-        let allGamesHaveScores = true; // Flag para verificar se todos os jogos têm placares válidos
-
-        generatedGames.forEach(game => {
-            // Verifica se o jogo tem placares válidos (soma > 0)
-            const scoreA = Number(game.gamesDuplaA);
-            const scoreB = Number(game.gamesDuplaB);
-
-            if (isNaN(scoreA) || isNaN(scoreB) || (scoreA + scoreB) === 0) {
-                allGamesHaveScores = false; // Há pelo menos um jogo sem placar válido ou com soma 0
-                return; // Não contabiliza estatísticas para jogos não finalizados/sem placar
-            }
-
-            const currentDuplaA = Array.isArray(game.duplaA) ? game.duplaA.join(' & ') : game.duplaA;
-            const currentDuplaB = Array.isArray(game.duplaB) ? game.duplaB.join(' & ') : game.duplaB;
-
-            // Garante que as duplas ou jogadores existam em playerStats
-            if (!(currentDuplaA in playerStats)) {
-                playerStats[currentDuplaA] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-            }
-            if (!(currentDuplaB in playerStats)) {
-                playerStats[currentDuplaB] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-            }
-
-            // Atualiza estatísticas de games
-            playerStats[currentDuplaA].gamesGanhos += scoreA;
-            playerStats[currentDuplaA].gamesPerdidos += scoreB;
-            playerStats[currentDuplaA].saldoGames += (scoreA - scoreB);
-
-            playerStats[currentDuplaB].gamesGanhos += scoreB;
-            playerStats[currentDuplaB].gamesPerdidos += scoreA;
-            playerStats[currentDuplaB].saldoGames += (scoreB - scoreA);
-
-            // Atualiza vitórias/derrotas e jogos disputados
-            if (scoreA > scoreB) {
-                playerStats[currentDuplaA].vitorias++;
-                playerStats[currentDuplaB].derrotas++;
-            } else if (scoreB > scoreA) {
-                playerStats[currentDuplaB].vitorias++;
-                playerStats[currentDuplaA].derrotas++;
-            }
-            // Empate não contabiliza vitória/derrota (não deveria acontecer em Beach Tennis normal)
-            
-            playerStats[currentDuplaA].jogosDisputados++;
-            playerStats[currentDuplaB].jogosDisputados++;
-        });
-
-        // Converte o objeto de estatísticas em um array para ordenação
-        let sortedStats = Object.keys(playerStats).map(name => ({ name, ...playerStats[name] }));
-
-        // Remove jogadores "Livre" da classificação, eles não competem
-        sortedStats = sortedStats.filter(stats => stats.name.toLowerCase() !== 'livre');
-
-        // Ordena pela maior número de vitórias, depois maior saldo de games
-        sortedStats.sort((a, b) => {
-            if (a.vitorias !== b.vitorias) {
-                return b.vitorias - a.vitorias; // Mais vitórias primeiro
-            }
-            if (a.saldoGames !== b.saldoGames) {
-                return b.saldoGames - a.saldoGames; // Maior saldo de games primeiro
-            }
-            // Critério de desempate por confronto direto (se aplicável e implementado)
-            // Esta parte é mais complexa e exigiria rastrear cada confronto
-            return 0; // Se tudo igual, a ordem original se mantém
-        });
-
-        // Limpa e preenche a tabela de resultados
-        tabelaResultadoBody.innerHTML = '';
-        sortedStats.forEach((stats, index) => {
-            const row = tabelaResultadoBody.insertRow();
-            const positionCell = row.insertCell();
-            positionCell.textContent = index + 1; // Posição
-
-            const nameCell = row.insertCell();
-            nameCell.textContent = stats.name; // Nome do jogador/dupla
-
-            row.insertCell().textContent = stats.vitorias;
-            row.insertCell().textContent = stats.derrotas;
-            row.insertCell().textContent = stats.saldoGames;
-            row.insertCell().textContent = stats.gamesGanhos;
-            row.insertCell().textContent = stats.gamesPerdidos;
-        });
-
-        // Lógica para exibir o campeão
-        if (showChampionPopup) {
-            if (generatedGames.length === 0) {
-                 displayMessage('championMessage', 'Nenhum jogo foi sorteado ainda.', true, true);
-            } else if (allGamesHaveScores) {
-                if (sortedStats.length > 0) {
-                    const champion = sortedStats[0];
-                    let championName = champion.name;
-
-                    // Verifica se há empate na primeira posição
-                    let tiedChampions = sortedStats.filter(s =>
-                        s.vitorias === champion.vitorias &&
-                        s.saldoGames === champion.saldoGames
-                    );
-
-                    if (tiedChampions.length > 1) {
-                        const tiedNames = tiedChampions.map(c => c.name).join(', ');
-                        displayMessage('championMessage', `Houve um empate na primeira posição entre: ${tiedNames}. Consulte os critérios de desempate abaixo.`, true);
-                    } else {
-                        displayMessage('championMessage', `Parabéns, ${championName}! Você é o campeão!`, true);
-                    }
+            for (let i = 0; i < effectiveN / 2; i++) {
+                let p1, p2;
+                if (i === 0) {
+                    p1 = fixedPlayer;
+                    p2 = rotatingPlayers[rotatingPlayers.length - 1 - i];
                 } else {
-                    displayMessage('championMessage', 'Não há jogadores/duplas para determinar o campeão.', true, true);
+                    p1 = rotatingPlayers[i - 1];
+                    p2 = rotatingPlayers[rotatingPlayers.length - 1 - i];
                 }
-            } else {
-                displayMessage('championMessage', 'O campeão será exibido quando todos os jogos tiverem um placar registrado (soma dos games acima de 0).', true, true);
+                roundDuos.push([p1, p2]);
             }
+            
+            shuffle(roundDuos);
+
+            const playableDuos = roundDuos.filter(duo => !duo.includes('Livre'));
+            for (let i = 0; i < playableDuos.length; i += 2) {
+                if (i + 1 < playableDuos.length) {
+                    allPotentialGames.push({
+                        duplaA: playableDuos[i],
+                        duplaB: playableDuos[i + 1],
+                        gamesDuplaA: 0, // Inicializa com 0
+                        gamesDuplaB: 0  // Inicializa com 0
+                    });
+                }
+            }
+
+            const lastPlayer = rotatingPlayers.pop();
+            rotatingPlayers.unshift(lastPlayer);
+            tempPlayers = [fixedPlayer, ...rotatingPlayers];
         }
+
+        let finalGames = [];
+        const numQuadras = parseInt(quadrasInput.value);
+        let currentRound = 1;
+        let currentQuadra = 1;
+
+        allPotentialGames.forEach(game => {
+            finalGames.push({
+                ...game,
+                rodada: currentRound,
+                quadra: currentQuadra
+            });
+
+            currentQuadra++;
+            if (currentQuadra > numQuadras) {
+                currentQuadra = 1;
+                currentRound++;
+            }
+        });
+        
+        return finalGames;
     }
 
-
-    // --- Gerenciamento de Sorteio ---
-    document.getElementById('btnSortear').addEventListener('click', handleSortGames);
-    document.getElementById('btnReiniciar').addEventListener('click', () => resetApplicationState(true));
-
-    function handleSortGames() {
-        displayMessage('gameCreationMessage', '', false); // Esconde mensagens anteriores
-        displayMessage('championMessage', '', false); // Esconde mensagens anteriores
-
-        let playersOrPot1 = [];
-        let pote2Players = [];
+    /**
+     * Gera jogos para o modo "Individual com Pote", garantindo que cada dupla PoteA-PoteB
+     * seja única ao longo de todo o torneio, e que cada jogo tenha 4 jogadores únicos.
+     * Tenta encontrar uma solução que balanceie os jogos entre os jogadores, priorizando quem jogou menos recentemente.
+     * Prioriza a variação nas duplas adversárias.
+     * @param {Array<string>} pote1 - Jogadores do Pote 1.
+     * @param {Array<string>} pote2 - Jogadores do Pote 2.
+     * @returns {Array<Object>} Lista de jogos gerados.
+     */
+    function generateGamesIndividualWithPot(pote1, pote2) {
+        const numPote1 = pote1.length;
+        const numPote2 = pote2.length;
         const numQuadras = parseInt(quadrasInput.value);
 
-        if (currentMode.includes('sem-pote')) {
-            playersOrPot1 = jogadoresTextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-            if (playersOrPot1.length < 4) {
-                displayMessage('gameCreationMessage', 'É necessário um mínimo de 4 jogadores para gerar jogos.', true, true);
-                return;
+        if (numPote1 < 2 || numPote2 < 2) {
+            alert("Para o modo 'Individual com pote', você precisa de pelo menos 2 jogadores em cada pote para formar jogos válidos (dupla contra dupla).");
+            return [];
+        }
+
+        let allPlayers = [...pote1, ...pote2];
+        let lastPlayedRound = {};
+        allPlayers.forEach(p => (lastPlayedRound[p] = -1));
+        
+        let allPossibleP1P2Duos = [];
+        pote1.forEach(pA => {
+            pote2.forEach(pB => {
+                allPossibleP1P2Duos.push([pA, pB]);
+            });
+        });
+        
+        let finalGames = [];
+        let usedP1P2DuosInTournament = new Set();
+        let usedPlayerPairsAsOpponents = new Set();
+
+        const arePlayersUnique = (pA1, pB1, pA2, pB2) => {
+            return new Set([pA1, pB1, pA2, pB2]).size === 4;
+        };
+
+        const haveDuosPlayedBefore = (duo1, duo2) => {
+            const players = [...duo1, ...duo2].sort();
+            return usedPlayerPairsAsOpponents.has(players.join('|'));
+        };
+
+        const markDuosAsOpponents = (duo1, duo2) => {
+            const players = [...duo1, ...duo2].sort();
+            usedPlayerPairsAsOpponents.add(players.join('|'));
+        };
+
+        let rodadaCounter = 1;
+        
+        let allGeneratedGames = [];
+
+        let safetyBreak = 0;
+        const MAX_ITERATIONS = 500;
+
+        while (safetyBreak < MAX_ITERATIONS) {
+            let gamesThisRoundAttempt = [];
+            let playersUsedInCurrentAttempt = new Set(); 
+            let availableP1P2Duos = allPossibleP1P2Duos.filter(duo => !usedP1P2DuosInTournament.has(duo.join('|')));
+            
+            shuffle(availableP1P2Duos);
+
+            availableP1P2Duos.sort((duo1, duo2) => {
+                const lp1_1 = lastPlayedRound[duo1[0]];
+                const lp1_2 = lastPlayedRound[duo1[1]];
+                const lp2_1 = lastPlayedRound[duo2[0]];
+                const lp2_2 = lastPlayedRound[duo2[1]];
+
+                const inactivitySum1 = (rodadaCounter - lp1_1) + (rodadaCounter - lp1_2);
+                const inactivitySum2 = (rodadaCounter - lp2_1) + (rodadaCounter - lp2_2);
+
+                return inactivitySum2 - inactivitySum1;
+            });
+
+
+            for (let i = 0; i < availableP1P2Duos.length; i++) {
+                const teamA = availableP1P2Duos[i];
+                if (playersUsedInCurrentAttempt.has(teamA[0]) || playersUsedInCurrentAttempt.has(teamA[1])) {
+                    continue;
+                }
+
+                for (let j = i + 1; j < availableP1P2Duos.length; j++) {
+                    const teamB = availableP1P2Duos[j];
+                    if (playersUsedInCurrentAttempt.has(teamB[0]) || playersUsedInCurrentAttempt.has(teamB[1])) {
+                        continue;
+                    }
+
+                    if (!arePlayersUnique(teamA[0], teamA[1], teamB[0], teamB[1])) {
+                        continue;
+                    }
+                    
+                    if (haveDuosPlayedBefore(teamA, teamB)) {
+                        continue;
+                    }
+
+                    gamesThisRoundAttempt.push({ 
+                        duplaA: teamA, 
+                        duplaB: teamB,
+                        gamesDuplaA: 0, // Inicializa com 0
+                        gamesDuplaB: 0  // Inicializa com 0
+                    });
+                    
+                    playersUsedInCurrentAttempt.add(teamA[0]);
+                    playersUsedInCurrentAttempt.add(teamA[1]);
+                    playersUsedInCurrentAttempt.add(teamB[0]);
+                    playersUsedInCurrentAttempt.add(teamB[1]);
+
+                    usedP1P2DuosInTournament.add(teamA.join('|'));
+                    usedP1P2DuosInTournament.add(teamB.join('|'));
+                    markDuosAsOpponents(teamA, teamB); 
+                    
+                    if (gamesThisRoundAttempt.length >= numQuadras) {
+                        break; 
+                    }
+                }
+                if (gamesThisRoundAttempt.length >= numQuadras) {
+                    break;
+                }
             }
-        } else { // Modos com pote
-            playersOrPot1 = pote1TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-            pote2Players = pote2TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-
-            if (playersOrPot1.length === 0 || pote2Players.length === 0) {
-                displayMessage('gameCreationMessage', 'Ambos os potes devem conter jogadores.', true, true);
-                return;
+            
+            if (gamesThisRoundAttempt.length === 0) {
+                break; 
             }
-            // A validação de tamanho de pote diferente e mensagem é feita dentro da função de geração
+
+            allGeneratedGames.push(...gamesThisRoundAttempt);
+
+            playersUsedInCurrentAttempt.forEach(player => {
+                lastPlayedRound[player] = rodadaCounter;
+            });
+
+            rodadaCounter++;
+            safetyBreak++;
         }
-
-        if (currentMode === 'individual-sem-pote') {
-            generatedGames = generateGamesIndividualNoPot(playersOrPot1, numQuadras);
-        } else if (currentMode === 'individual-com-pote') {
-            generatedGames = generateGamesIndividualWithPot(playersOrPot1, pote2Players, numQuadras);
-        } else if (currentMode === 'dupla-fixa-sem-pote') {
-            generatedGames = generateGamesDuplaFixaNoPot(playersOrPot1, numQuadras);
-        } else if (currentMode === 'dupla-fixa-com-pote') {
-            generatedGames = generateGamesDuplaFixaWithPot(playersOrPot1, pote2Players, numQuadras);
-        }
-
-        if (generatedGames.length === 0) {
-            // Se as funções de geração retornarem vazio, elas já terão exibido uma mensagem de erro específica.
-            // Apenas retorna para evitar prosseguir com o estado inválido.
-            return;
-        }
-
-        displayGames(generatedGames);
-        updateClassification(false); // Não mostra pop-up de campeão no sorteio inicial
-        saveGameState();
-        setConfigurationFieldsDisabled(true);
-        radiosModo.forEach(radio => radio.disabled = true);
-
-        // Mudar para a aba "Jogos" após o sorteio
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        document.querySelector('button[data-tab="jogos"]').classList.add('active');
-        sections.forEach(sec => {
-            if (sec.id === 'jogos') sec.classList.add('active');
-            else sec.classList.remove('active');
+        
+        let currentAssignedRound = 1;
+        let currentAssignedQuadra = 1;
+        allGeneratedGames.forEach(game => {
+            finalGames.push({
+                ...game,
+                rodada: currentAssignedRound,
+                quadra: currentAssignedQuadra
+            });
+            currentAssignedQuadra++;
+            if (currentAssignedQuadra > numQuadras) {
+                currentAssignedQuadra = 1;
+                currentAssignedRound++;
+            }
         });
 
-        // Exibir pop-up de sucesso após o sorteio
-        showPopup('Sorteio Realizado!', 'Os jogos foram criados com sucesso!');
+        return finalGames;
     }
 
 
-    // --- Lógica para Potes Diferentes (excluir/mover jogador) ---
-    document.getElementById('btnExcludePlayer').addEventListener('click', () => {
-        let pote1Players = pote1TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
-        let pote2Players = pote2TextArea.value.split('\n').map(p => p.trim()).filter(p => p !== '');
+    /**
+     * Gera duplas fixas a partir de uma lista de jogadores.
+     * Se houver um número ímpar de jogadores, o último jogador é pareado com 'Livre'.
+     * Armazena as duplas geradas em fixedDuosMap para uso na classificação.
+     * @param {Array<string>} players - Lista de nomes dos jogadores.
+     * @returns {Array<Array<string>>} Lista de duplas fixas.
+     */
+    function generateFixedDuos(players) {
+        const shuffledPlayers = [...players];
+        shuffle(shuffledPlayers);
+        let duos = [];
+        fixedDuosMap = {}; // Resetar fixedDuosMap a cada geração para evitar lixo de estado anterior
+        for (let i = 0; i < shuffledPlayers.length; i += 2) {
+            let duo;
+            if (i + 1 < shuffledPlayers.length) {
+                duo = [shuffledPlayers[i], shuffledPlayers[i + 1]].sort();
+            } else {
+                duo = [shuffledPlayers[i], 'Livre'].sort();
+            }
+            duos.push(duo);
+            fixedDuosMap[duo.join(' & ')] = duo.join(' & '); // Armazena a dupla normalizada como chave e valor
+        }
+        return duos;
+    }
 
-        if (pote1Players.length === pote2Players.length) {
-            displayMessage('gameCreationMessage', 'Os potes já têm o mesmo número de jogadores.', true, true);
+    /**
+     * Gera jogos para o modo "Dupla Fixa sem Pote" usando Round-Robin
+     * e os distribui sequencialmente pelas quadras disponíveis.
+     * @param {Array<string>} players - Lista de nomes dos jogadores para formar duplas.
+     * @returns {Array<Object>} Lista de jogos gerados com rodada e quadra atribuída.
+     */
+    function generateGamesFixedDuoNoPot(players) {
+        const fixedDuos = generateFixedDuos(players);
+        let allPotentialGames = [];
+        const numQuadras = parseInt(quadrasInput.value);
+
+        let tempDuos = [...fixedDuos];
+        if (tempDuos.length % 2 !== 0) {
+            tempDuos.push(['Livre', 'Livre']);
+        }
+        
+        const numDuplas = tempDuos.length;
+        const numRoundsTheoretical = numDuplas - 1;
+
+        for (let r = 0; r < numRoundsTheoretical; r++) {
+            let gamesInRoundTheoretical = [];
+            for (let i = 0; i < numDuplas / 2; i++) {
+                const duplaA = tempDuos[i];
+                const duplaB = tempDuos[numDuplas - 1 - i];
+
+                if (!duplaA.includes('Livre') && !duplaB.includes('Livre')) {
+                    gamesInRoundTheoretical.push({
+                        duplaA: duplaA,
+                        duplaB: duplaB,
+                        gamesDuplaA: 0, // Inicializa com 0
+                        gamesDuplaB: 0  // Inicializa com 0
+                    });
+                }
+            }
+            allPotentialGames.push(...gamesInRoundTheoretical);
+
+            const firstDuo = tempDuos[0];
+            const rotatingDuos = tempDuos.slice(1);
+            const lastDuo = rotatingDuos.pop();
+            rotatingDuos.unshift(lastDuo);
+            tempDuos = [firstDuo, ...rotatingDuos];
+        }
+        
+        let finalGames = [];
+        let currentRound = 1;
+        let currentQuadra = 1;
+
+        allPotentialGames.forEach(game => {
+            finalGames.push({
+                ...game,
+                rodada: currentRound,
+                quadra: currentQuadra
+            });
+
+            currentQuadra++;
+            if (currentQuadra > numQuadras) {
+                currentQuadra = 1;
+                currentRound++;
+            }
+        });
+        
+        return finalGames;
+    }
+
+
+    /**
+     * Gera duplas fixas combinando jogadores de dois potes.
+     * Cada jogador do Pote 1 é pareado com um jogador do Pote 2.
+     * Armazena as duplas geradas em fixedDuosMap para uso na classificação.
+     * @param {Array<string>} pote1 - Jogadores do Pote 1.
+     * @param {Array<string>} pote2 - Jogadores do Pote 2.
+     * @returns {Array<Array<string>>} Lista de duplas fixas.
+     */
+    function generateFixedDuosWithPot(pote1, pote2) {
+        const shuffledPot1 = [...pote1];
+        const shuffledPot2 = [...pote2];
+        shuffle(shuffledPot1);
+        shuffle(shuffledPot2);
+
+        let duos = [];
+        fixedDuosMap = {}; // Resetar fixedDuosMap a cada geração para evitar lixo de estado anterior
+        const minLength = Math.min(shuffledPot1.length, shuffledPot2.length);
+
+        for (let i = 0; i < minLength; i++) {
+            const duo = [shuffledPot1[i], shuffledPot2[i]].sort();
+            duos.push(duo);
+            fixedDuosMap[duo.join(' & ')] = duo.join(' & '); // Armazena a dupla normalizada como chave e valor
+        }
+        return duos;
+    }
+
+    /**
+     * Gera todos os jogos possíveis para o modo "Dupla Fixa com Pote" usando Round-Robin
+     * e os distribui sequencialmente pelas quadras disponíveis.
+     * @param {Array<string>} pote1 - Jogadores do Pote 1.
+     * @param {Array<string>} pote2 - Jogadores do Pote 2.
+     * @returns {Array<Object>} Lista de jogos gerados com rodada e quadra atribuída.
+     */
+    function generateGamesFixedDuoWithPot(pote1, pote2) {
+        const fixedDuos = generateFixedDuosWithPot(pote1, pote2);
+        let allPotentialGames = [];
+        const numQuadras = parseInt(quadrasInput.value);
+
+        let tempDuos = [...fixedDuos];
+        if (tempDuos.length % 2 !== 0) {
+            tempDuos.push(['Livre', 'Livre']);
+        }
+        
+        const numDuplas = tempDuos.length;
+        const numRoundsTheoretical = numDuplas - 1;
+
+        for (let r = 0; r < numRoundsTheoretical; r++) {
+            let gamesInRoundTheoretical = [];
+            for (let i = 0; i < numDuplas / 2; i++) {
+                const duplaA = tempDuos[i];
+                const duplaB = tempDuos[numDuplas - 1 - i];
+
+                if (!duplaA.includes('Livre') && !duplaB.includes('Livre')) {
+                    gamesInRoundTheoretical.push({
+                        duplaA: duplaA,
+                        duplaB: duplaB,
+                        gamesDuplaA: 0, // Inicializa com 0
+                        gamesDuplaB: 0  // Inicializa com 0
+                    });
+                }
+            }
+            allPotentialGames.push(...gamesInRoundTheoretical);
+
+            const firstDuo = tempDuos[0];
+            const rotatingDuos = tempDuos.slice(1);
+            const lastDuo = rotatingDuos.pop();
+            rotatingDuos.unshift(lastDuo);
+            tempDuos = [firstDuo, ...rotatingDuos];
+        }
+        
+        let finalGames = [];
+        let currentRound = 1;
+        let currentQuadra = 1;
+
+        allPotentialGames.forEach(game => {
+            finalGames.push({
+                ...game,
+                rodada: currentRound,
+                quadra: currentQuadra
+            });
+
+            currentQuadra++;
+            if (currentQuadra > numQuadras) {
+                currentQuadra = 1;
+                currentRound++;
+            }
+        });
+        
+        return finalGames;
+    }
+
+    // --- Funções de Exibição e Gerenciamento ---
+
+    /**
+     * Exibe os jogos gerados na tabela da aba "Jogos", utilizando as propriedades 'rodada' e 'quadra'
+     * já definidas na geração dos jogos.
+     * @param {Array<Object>} games - Lista de jogos a serem exibidos.
+     */
+    function displayGames(games) { 
+        tabelaJogosBody.innerHTML = '';
+
+        if (games.length === 0) {
+            tabelaJogosBody.innerHTML = '<tr><td colspan="5">Nenhum jogo gerado. Verifique os jogadores e o modo de jogo.</td></tr>';
             return;
         }
 
-        let largerPote = [];
-        let largerPoteName = '';
-        if (pote1Players.length > pote2Players.length) {
-            largerPote = pote1Players;
-            largerPoteName = 'Pote 1';
-        } else {
-            largerPote = pote2Players;
-            largerPoteName = 'Pote 2';
+        games.forEach((game, i) => {
+            const row = document.createElement('tr');
+
+            const roundCell = document.createElement('td');
+            roundCell.classList.add('col-rodada');
+            roundCell.textContent = game.rodada; 
+            row.appendChild(roundCell);
+
+            const courtCell = document.createElement('td');
+            courtCell.classList.add('col-quadra');
+            courtCell.textContent = game.quadra; 
+            row.appendChild(courtCell);
+
+            const teamACell = document.createElement('td');
+            teamACell.textContent = Array.isArray(game.duplaA) ? game.duplaA.join(' & ') : game.duplaA;
+            row.appendChild(teamACell);
+            
+            const resultCell = document.createElement('td');
+            const isTeamALibre = Array.isArray(game.duplaA) && game.duplaA.includes('Livre');
+            const isTeamBLibre = Array.isArray(game.duplaB) && game.duplaB.includes('Livre');
+
+            if (!isTeamALibre && !isTeamBLibre) {
+                const inputA = document.createElement('input');
+                inputA.type = 'number';
+                inputA.min = 0;
+                inputA.className = 'result-input';
+                inputA.dataset.gameIndex = i; 
+                inputA.dataset.team = 'A';
+                // Garante que o valor inicial seja o valor do jogo ou 0 se undefined
+                inputA.value = game.gamesDuplaA !== undefined ? game.gamesDuplaA : 0;
+
+                const inputB = document.createElement('input');
+                inputB.type = 'number';
+                inputB.min = 0;
+                inputB.className = 'result-input';
+                inputB.dataset.gameIndex = i; 
+                inputB.dataset.team = 'B';
+                // Garante que o valor inicial seja o valor do jogo ou 0 se undefined
+                inputB.value = game.gamesDuplaB !== undefined ? game.gamesDuplaB : 0;
+
+                inputA.addEventListener('change', updateResult);
+                inputB.addEventListener('change', updateResult);
+
+                resultCell.appendChild(inputA);
+                resultCell.appendChild(document.createTextNode(' x '));
+                resultCell.appendChild(inputB);
+            } else {
+                resultCell.textContent = '-';
+            }
+            row.appendChild(resultCell);
+
+            const teamBCell = document.createElement('td');
+            teamBCell.textContent = Array.isArray(game.duplaB) ? game.duplaB.join(' & ') : game.duplaB;
+            row.appendChild(teamBCell);
+
+            tabelaJogosBody.appendChild(row);
+        });
+    }
+
+    /**
+     * Atualiza o resultado de um jogo no array `generatedGames`, recalcula a classificação
+     * e salva o estado do jogo.
+     * @param {Event} event - O evento de mudança do input de resultado.
+     */
+    function updateResult(event) {
+        const input = event.target;
+        const gameIndex = parseInt(input.dataset.gameIndex);
+        const team = input.dataset.team;
+        let value = parseInt(input.value); // Use let para permitir modificação
+
+        if (isNaN(value) || value < 0) {
+            // Se o valor não é um número ou é negativo, reseta para 0
+            value = 0; // Define para 0
+            input.value = 0; // Atualiza o campo de input
+            showPopup('Entrada Inválida', 'Por favor, insira um número válido (0 ou mais) para os games.');
+            // Não retorna, apenas corrige o valor e continua
         }
 
-        // Exibe um alerta e remove o último jogador do pote maior
-        const playerToRemove = largerPote[largerPote.length - 1];
-        if (confirm(`Remover "${playerToRemove}" do ${largerPoteName}?`)) {
-            largerPote.pop();
-            if (largerPoteName === 'Pote 1') {
-                pote1TextArea.value = largerPote.join('\n');
-            } else {
-                pote2TextArea.value = largerPote.join('\n');
+        if (generatedGames[gameIndex]) {
+            generatedGames[gameIndex][`gamesDupla${team}`] = value;
+        }
+        updateClassification();
+        saveGameState();
+    }
+
+    /**
+     * Normaliza um array de jogadores (dupla) para uma chave consistente (string).
+     * Ex: ['Pedro', 'Lucas'] vira 'Lucas & Pedro'
+     * @param {Array<string>} playersArray - Array de jogadores.
+     * @returns {string} Chave normalizada.
+     */
+    function normalizeDuoName(playersArray) {
+        if (!Array.isArray(playersArray) || playersArray.length === 0) {
+            return '';
+        }
+        const filteredPlayers = playersArray.filter(p => p !== 'Livre');
+        if (filteredPlayers.length === 0) {
+            return 'Livre & Livre';
+        }
+        return filteredPlayers.sort().join(' & ');
+    }
+
+    /**
+     * Compara duas estatísticas para determinar se são idênticas para fins de empate.
+     * @param {Object} stats1 - Objeto de estatísticas do primeiro jogador/dupla.
+     * @param {Object} stats2 - Objeto de estatísticas do segundo jogador/dupla.
+     * @param {boolean} isFixedDuoMode - Indica se está no modo de dupla fixa.
+     * @returns {boolean} True se as estatísticas são idênticas, False caso contrário.
+     */
+    function areStatsIdentical(stats1, stats2, isFixedDuoMode) {
+        if (!stats1 || !stats2) return false;
+
+        if (stats1.wins !== stats2.wins) return false;
+        if (stats1.gamesBalance !== stats2.gamesBalance) return false;
+
+        const name1 = stats1.name;
+        const name2 = stats2.name;
+
+        // Verifica confronto direto apenas se ambos têm histórico contra o outro
+        const h2h1_vs_2 = (stats1.headToHead && stats1.headToHead[name2]) ? stats1.headToHead[name2] : 0;
+        const h2h2_vs_1 = (stats2.headToHead && stats2.headToHead[name1]) ? stats2.headToHead[name1] : 0;
+        
+        // Se ambos não tiveram confronto direto ou tiveram confronto direto com o mesmo resultado,
+        // então são considerados empatados pelo critério de confronto direto.
+        // Se um venceu o confronto direto e o outro não, não são idênticos.
+        return h2h1_vs_2 === h2h2_vs_1;
+    }
+
+    /**
+     * Atualiza a tabela de classificação na aba "Resultado" com base nos jogos registrados.
+     * Adapta a exibição para duplas ou jogadores individuais.
+     */
+    function updateClassification() {
+        tabelaResultadoBody.innerHTML = '';
+        championInfoDiv.innerHTML = ''; // Clear champion info on update
+
+        if (generatedGames.length === 0) {
+            tabelaResultadoBody.innerHTML = '<tr><td colspan="7">Nenhum resultado disponível. Sortear jogos para ver a classificação.</td></tr>';
+            championInfoDiv.innerHTML = 'Nenhum resultado disponível. Sortear jogos para ver a classificação.';
+            headerName.textContent = 'Jogador'; // Reset to default
+            return; // Exit the function early
+        }
+
+        const isFixedDuoMode = currentMode.startsWith('dupla-fixa');
+
+        headerName.textContent = isFixedDuoMode ? 'Dupla' : 'Jogador';
+
+        let sortedEntities = [];
+
+        if (isFixedDuoMode) {
+            const duoStats = {};
+
+            // Pega todas as duplas que foram geradas para os jogos
+            // ou as duplas fixas que foram configuradas inicialmente
+            let allPotentialDuos = new Set();
+            if (currentMode === 'dupla-fixa-sem-pote') {
+                const playersFromInput = parsePlayerInput(jogadoresTextArea.value);
+                const tempPlayers = [...playersFromInput];
+                // Cria as duplas fixas para garantir que todas as duplas potenciais sejam consideradas
+                const duos = [];
+                for (let i = 0; i < tempPlayers.length; i += 2) {
+                    let duo;
+                    if (i + 1 < tempPlayers.length) {
+                        duo = [tempPlayers[i], tempPlayers[i + 1]].sort();
+                    } else {
+                        duo = [tempPlayers[i], 'Livre'].sort(); // Lidar com número ímpar
+                    }
+                    if (!duo.includes('Livre')) { // Adicionar apenas duplas "reais"
+                        duos.push(duo);
+                        allPotentialDuos.add(normalizeDuoName(duo));
+                    }
+                }
+            } else if (currentMode === 'dupla-fixa-com-pote') {
+                const pote1Players = parsePlayerInput(pote1TextArea.value);
+                const pote2Players = parsePlayerInput(pote2TextArea.value);
+                const minLength = Math.min(pote1Players.length, pote2Players.length);
+                for (let i = 0; i < minLength; i++) {
+                    const duo = [pote1Players[i], pote2Players[i]].sort();
+                    allPotentialDuos.add(normalizeDuoName(duo));
+                }
             }
-            displayMessage('gameCreationMessage', `"${playerToRemove}" foi removido do ${largerPoteName}.`, true);
-            poteOptionsDiv.style.display = 'none'; // Esconde opções após a ação
-            playerActionInfoDiv.style.display = 'none';
-            updateQuadrasInputLimits();
+
+            // Inicializa estatísticas para todas as duplas potenciais, mesmo que não tenham jogado
+            allPotentialDuos.forEach(duoName => {
+                duoStats[duoName] = {
+                    name: duoName,
+                    wins: 0,
+                    losses: 0,
+                    gamesWon: 0,
+                    gamesLost: 0,
+                    gamesBalance: 0,
+                    headToHead: {}
+                };
+            });
+
+            // Processa os jogos gerados
+            generatedGames.forEach(game => {
+                const duoA = normalizeDuoName(game.duplaA);
+                const duoB = normalizeDuoName(game.duplaB);
+                
+                if (duoA === 'Livre & Livre' || duoB === 'Livre & Livre') {
+                    return; // Ignora jogos com duplas "Livre"
+                }
+                
+                // Garante que as duplas existam no duoStats (se ainda não existirem por algum motivo)
+                if (!duoStats[duoA]) duoStats[duoA] = { name: duoA, wins: 0, losses: 0, gamesWon: 0, gamesLost: 0, gamesBalance: 0, headToHead: {} };
+                if (!duoStats[duoB]) duoStats[duoB] = { name: duoB, wins: 0, losses: 0, gamesWon: 0, gamesLost: 0, gamesBalance: 0, headToHead: {} };
+
+                // Utiliza os valores dos games ou 0 se não estiverem definidos/null
+                const gamesA = game.gamesDuplaA !== undefined && game.gamesDuplaA !== null ? game.gamesDuplaA : 0;
+                const gamesB = game.gamesDuplaB !== undefined && game.gamesDuplaB !== null ? game.gamesDuplaB : 0;
+
+                duoStats[duoA].gamesWon += gamesA;
+                duoStats[duoA].gamesLost += gamesB;
+                duoStats[duoB].gamesWon += gamesB;
+                duoStats[duoB].gamesLost += gamesA;
+
+                if (gamesA > gamesB) {
+                    duoStats[duoA].wins++;
+                    duoStats[duoB].losses++;
+                    if (!duoStats[duoA].headToHead[duoB]) duoStats[duoA].headToHead[duoB] = 0;
+                    duoStats[duoA].headToHead[duoB]++;
+                } else if (gamesB > gamesA) {
+                    duoStats[duoB].wins++;
+                    duoStats[duoA].losses++;
+                    if (!duoStats[duoB].headToHead[duoA]) duoStats[duoB].headToHead[duoA] = 0;
+                    duoStats[duoB].headToHead[duoA]++;
+                }
+            });
+
+            // Calcula o saldo de games para todas as duplas
+            Object.values(duoStats).forEach(stats => {
+                stats.gamesBalance = stats.gamesWon - stats.gamesLost;
+            });
+
+            // Filtra e ordena as duplas
+            sortedEntities = Object.values(duoStats)
+                                    .filter(duo => duo.name !== "Livre & Livre") // Remove a dupla "Livre & Livre" da classificação
+                                    .sort((a, b) => {
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                if (b.gamesBalance !== a.gamesBalance) return b.gamesBalance - a.gamesBalance;
+
+                // Confronto Direto: Se A ganhou de B no H2H, A vem antes de B (retorna -1).
+                // Se B ganhou de A, B vem antes de A (retorna 1).
+                // Se não houve confronto direto ou empate no confronto direto, retorna 0.
+                const h2hA_vs_B = (a.headToHead[b.name] || 0);
+                const h2hB_vs_A = (b.headToHead[a.name] || 0);
+                
+                if (h2hA_vs_B > h2hB_vs_A) return -1; // A venceu o confronto direto
+                if (h2hB_vs_A > h2hA_vs_B) return 1;  // B venceu o confronto direto
+
+                return 0; // Mantém a ordem original ou considera empatado se os H2H forem iguais
+            });
+
+        } else { // Modo Individual
+            const uniquePlayers = new Set();
+            // Adiciona jogadores dos campos de texto (pode ser pote1/pote2 ou jogadores)
+            if (currentMode.includes('com-pote')) {
+                parsePlayerInput(pote1TextArea.value).forEach(p => uniquePlayers.add(p));
+                parsePlayerInput(pote2TextArea.value).forEach(p => uniquePlayers.add(p));
+            } else {
+                parsePlayerInput(jogadoresTextArea.value).forEach(p => uniquePlayers.add(p));
+            }
+            
+            const playersArray = Array.from(uniquePlayers).filter(p => p !== 'Livre'); // Filtra "Livre"
+
+            const playerStats = {};
+            playersArray.forEach(player => {
+                playerStats[player] = {
+                    name: player,
+                    wins: 0,
+                    losses: 0,
+                    gamesWon: 0,
+                    gamesLost: 0,
+                    gamesBalance: 0,
+                    headToHead: {}
+                };
+            });
+
+            generatedGames.forEach(game => {
+                const teamA = Array.isArray(game.duplaA) ? game.duplaA.filter(p => p !== 'Livre') : (game.duplaA === 'Livre' ? [] : [game.duplaA]);
+                const teamB = Array.isArray(game.duplaB) ? game.duplaB.filter(p => p !== 'Livre') : (game.duplaB === 'Livre' ? [] : [game.duplaB]);
+
+                if (teamA.length === 0 || teamB.length === 0) return; // Ignora jogos com jogadores "Livre"
+
+                // Utiliza os valores dos games ou 0 se não estiverem definidos/null
+                const gamesA = game.gamesDuplaA !== undefined && game.gamesDuplaA !== null ? game.gamesDuplaA : 0;
+                const gamesB = game.gamesDuplaB !== undefined && game.gamesDuplaB !== null ? game.gamesDuplaB : 0;
+
+                teamA.forEach(player => {
+                    if (playerStats[player]) {
+                        playerStats[player].gamesWon += gamesA;
+                        playerStats[player].gamesLost += gamesB;
+                    }
+                });
+                teamB.forEach(player => {
+                    if (playerStats[player]) {
+                        playerStats[player].gamesWon += gamesB;
+                        playerStats[player].gamesLost += gamesA;
+                    }
+                });
+
+                if (gamesA > gamesB) {
+                    teamA.forEach(player => { if (playerStats[player]) playerStats[player].wins++; });
+                    teamB.forEach(player => { if (playerStats[player]) playerStats[player].losses++; });
+                } else if (gamesB > gamesA) {
+                    teamB.forEach(player => { if (playerStats[player]) playerStats[player].wins++; });
+                    teamA.forEach(player => { if (playerStats[player]) playerStats[player].losses++; });
+                }
+
+                // Confronto Direto para cada par de jogadores no jogo
+                teamA.forEach(pA => {
+                    teamB.forEach(pB => {
+                        if (playerStats[pA] && playerStats[pB]) {
+                            // Inicializa o headToHead se não existir
+                            if (!playerStats[pA].headToHead[pB]) playerStats[pA].headToHead[pB] = 0;
+                            if (!playerStats[pB].headToHead[pA]) playerStats[pB].headToHead[pA] = 0;
+
+                            if (gamesA > gamesB) playerStats[pA].headToHead[pB]++;
+                            else if (gamesB > gamesA) playerStats[pB].headToHead[pA]++;
+                        }
+                    });
+                });
+            });
+
+            // Calcula o saldo de games para todos os jogadores
+            playersArray.forEach(player => {
+                if (playerStats[player]) {
+                    playerStats[player].gamesBalance = playerStats[player].gamesWon - playerStats[player].gamesLost;
+                }
+            });
+
+            // Filtra "Livre" e ordena os jogadores
+            sortedEntities = playersArray
+                                .filter(player => player !== 'Livre' && playerStats[player])
+                                .map(player => playerStats[player]) // Mapeia para o objeto de estatísticas
+                                .sort((a, b) => {
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                if (b.gamesBalance !== a.gamesBalance) return b.gamesBalance - a.gamesBalance;
+                
+                const h2hA_vs_B = (a.headToHead[b.name] || 0);
+                const h2hB_vs_A = (b.headToHead[a.name] || 0);
+
+                if (h2hA_vs_B > h2hB_vs_A) return -1;
+                if (h2hB_vs_A > h2hA_vs_B) return 1;
+
+                return 0;
+            });
+        }
+
+        let currentRank = 1;
+        let previousEntityStats = null;
+
+        sortedEntities.forEach((stats, index) => {
+            let displayRank = currentRank;
+
+            if (index > 0) {
+                if (areStatsIdentical(stats, previousEntityStats, isFixedDuoMode)) {
+                    displayRank = currentRank;
+                } else {
+                    currentRank = index + 1;
+                    displayRank = currentRank;
+                }
+            }
+            
+            previousEntityStats = stats; 
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${displayRank}</td>
+                <td>${stats.name}</td>
+                <td>${stats.wins}</td>
+                <td>${stats.losses}</td>
+                <td>${stats.gamesBalance}</td>
+                <td>${stats.gamesWon}</td>
+                <td>${stats.gamesLost}</td>
+            `;
+            tabelaResultadoBody.appendChild(row);
+        });
+
+        // --- Lógica para exibir o campeão abaixo da tabela ---
+        let allGamesScoredValidly = true;
+        for (const game of generatedGames) {
+            // Se um jogo envolve "Livre", ele é ignorado para a validação de placar completo.
+            // Para ser "completo", ele precisa ser um jogo "real" com placar diferente de 0x0.
+            const isTeamALibre = Array.isArray(game.duplaA) && game.duplaA.includes('Livre');
+            const isTeamBLibre = Array.isArray(game.duplaB) && game.duplaB.includes('Livre');
+            
+            if (isTeamALibre || isTeamBLibre) {
+                continue; // Ignora jogos com 'Livre' para esta validação
+            }
+
+            const gamesA = game.gamesDuplaA;
+            const gamesB = game.gamesDuplaB;
+
+            // Verifica se os scores são definidos e se pelo menos um é maior que zero
+            if (gamesA === undefined || gamesA === null || gamesB === undefined || gamesB === null ||
+                (gamesA === 0 && gamesB === 0)) { 
+                allGamesScoredValidly = false;
+                break;
+            }
+        }
+
+        if (allGamesScoredValidly && sortedEntities.length > 0) {
+            const topRanked = sortedEntities[0];
+            const champions = [topRanked.name];
+            let tieCount = 1;
+
+            for (let i = 1; i < sortedEntities.length; i++) {
+                if (areStatsIdentical(topRanked, sortedEntities[i], isFixedDuoMode)) {
+                    champions.push(sortedEntities[i].name);
+                    tieCount++;
+                } else {
+                    break;
+                }
+            }
+
+            let championText = '';
+            if (tieCount === 1) {
+                championText = `O campeão é: <strong>${champions[0]}</strong>!`;
+            } else {
+                const entityType = isFixedDuoMode ? 'duplas' : 'jogadores';
+                championText = `Houve um empate em 1º lugar entre ${tieCount} ${entityType}: <br><strong>${champions.join(', ')}</strong>.`;
+            }
+            championInfoDiv.innerHTML = championText;
+        } else {
+            championInfoDiv.innerHTML = 'Para ver o campeão, preencha todos os resultados dos jogos.';
+        }
+    }
+
+    /**
+     * Reseta o estado da aplicação, limpando campos, tabelas e variáveis globais.
+     * @param {boolean} clearLocalStorage - Se true, limpa também os dados do localStorage.
+     */
+    function resetApplicationState(clearLocalStorage = true) {
+        jogadoresTextArea.value = 'Lucas\nMaria\nPedro\nAna\nJoão\nCarla\nPaulo\nMarina';
+        pote1TextArea.value = 'A\nB\nC\nD'; 
+        pote2TextArea.value = '1\n2\n3\n4';
+        generatedGames = [];
+        fixedDuosMap = {};
+        poteOptionsDiv.style.display = 'none';
+        playerActionInfoDiv.style.display = 'none';
+        
+        // Chama displayGames com um array vazio para garantir que a tabela de jogos seja completamente limpa.
+        displayGames([]); 
+        
+        updateClassification(); // Atualiza a classificação para limpar a tabela e info de campeão
+        quadrasInput.value = 1; 
+        updateQuadrasInputLimits(); 
+        setConfigurationFieldsDisabled(false);
+        sortResultInfo.textContent = ''; // Limpa a mensagem de sorteio
+        
+        radiosModo.forEach(radio => radio.disabled = false);
+        document.querySelector('input[name="modo"][value="individual-sem-pote"]').checked = true;
+        campoComPote.style.display = 'none';
+        campoSemPote.style.display = 'block';
+        currentMode = 'individual-sem-pote';
+
+        if (clearLocalStorage) {
+            localStorage.removeItem(LOCAL_STORAGE_KEY_GAMES);
+            localStorage.removeItem(LOCAL_STORAGE_KEY_CONFIG);
+            localStorage.removeItem(LOCAL_STORAGE_KEY_MODE_LOCKED); 
+            localStorage.removeItem(LOCAL_STORAGE_KEY_FIXED_DUOS);
+        }
+    }
+
+    // --- Event Listeners para Botões de Ação de Potes Desbalanceados ---
+
+    document.getElementById('btnExcludePlayer').addEventListener('click', () => {
+        let pote1 = parsePlayerInput(pote1TextArea.value);
+        let pote2 = parsePlayerInput(pote2TextArea.value);
+
+        let largerPoteRef;
+        let largerPoteName; 
+        if (pote1.length > pote2.length) {
+            largerPoteRef = pote1;
+            largerPoteName = "Pote 1";
+        }
+        else if (pote2.length > pote1.length) {
+            largerPoteRef = pote2;
+            largerPoteName = "Pote 2";
+        }
+        else {
+            showPopup('Ação Inválida', 'Os potes já estão balanceados. Não há jogador para excluir.');
+            poteOptionsDiv.style.display = 'none';
+            return;
+        }
+        
+        const randomIndex = Math.floor(Math.random() * largerPoteRef.length);
+        const excludedPlayer = largerPoteRef.splice(randomIndex, 1)[0];
+        
+        playerActionInfoDiv.innerHTML = `Jogador <span class="player-highlight">${excludedPlayer}</span> foi excluído do ${largerPoteName}.`;
+        playerActionInfoDiv.style.display = 'block';
+
+        pote1TextArea.value = pote1.join('\n');
+        pote2TextArea.value = pote2.join('\n');
+
+        poteOptionsDiv.style.display = 'none';
+        updateQuadrasInputLimits(); 
+        // Não chama handleSortGames diretamente aqui, mas o usuário pode clicar em Sortear novamente
+    });
+
+    document.getElementById('btnMovePlayer').addEventListener('click', () => {
+        let pote1 = parsePlayerInput(pote1TextArea.value);
+        let pote2 = parsePlayerInput(pote2TextArea.value);
+
+        let largerPoteRef, smallerPoteRef;
+        let largerPoteName, smallerPoteName; 
+        if (pote1.length > pote2.length) {
+            largerPoteRef = pote1;
+            smallerPoteRef = pote2;
+            largerPoteName = "Pote 1";
+            smallerPoteName = "Pote 2";
+        }
+        else if (pote2.length > pote1.length) {
+            largerPoteRef = pote2;
+            smallerPoteRef = pote1;
+            largerPoteName = "Pote 2";
+            smallerPoteName = "Pote 1";
+        }
+        else {
+            showPopup('Ação Inválida', 'Os potes já estão balanceados. Não há jogador para mover.');
+            poteOptionsDiv.style.display = 'none';
+            return;
+        }
+
+        if (Math.abs(largerPoteRef.length - smallerPoteRef.length) === 2) {
+            const randomIndex = Math.floor(Math.random() * largerPoteRef.length);
+            const movedPlayer = largerPoteRef.splice(randomIndex, 1)[0];
+            smallerPoteRef.push(movedPlayer);
+
+            playerActionInfoDiv.innerHTML = `Jogador <span class="player-highlight">${movedPlayer}</span> foi movido do ${largerPoteName} para o ${smallerPoteName}.`;
+            playerActionInfoDiv.style.display = 'block';
+
+            pote1TextArea.value = pote1.join('\n');
+            pote2TextArea.value = pote2.join('\n');
+
+            poteOptionsDiv.style.display = 'none';
+            updateQuadrasInputLimits(); 
+            // Não chama handleSortGames diretamente aqui
+        } else {
+            showPopup('Ação Inválida', "Não é possível balancear os potes para tamanhos iguais movendo apenas um jogador. Considere excluir.");
         }
     });
 
+    // --- Função Principal para Iniciar o Sorteio ---
+
+    function handleSortGames() {
+        currentMode = document.querySelector('input[name="modo"]:checked').value;
+        const selectedQuadras = parseInt(quadrasInput.value);
+
+        if (currentMode.includes('com-pote')) {
+            let pote1 = parsePlayerInput(pote1TextArea.value);
+            let pote2 = parsePlayerInput(pote2TextArea.value);
+
+            if (pote1.length === 0 || pote2.length === 0) {
+                showPopup('Erro de Configuração', 'Por favor, preencha ambos os potes para o modo com pote.');
+                return;
+            }
+
+            if (currentMode === 'dupla-fixa-com-pote' && pote1.length !== pote2.length) {
+                poteOptionsDiv.style.display = 'block';
+                playerActionInfoDiv.style.display = 'none';
+                
+                if (Math.abs(pote1.length - pote2.length) === 2) {
+                    btnMovePlayer.style.display = 'inline-block';
+                } else {
+                    btnMovePlayer.style.display = 'none';
+                }
+                showPopup('Potes Desbalanceados', 'Para o modo "Dupla Fixa com Pote", os potes devem ter o mesmo número de jogadores. Por favor, escolha uma ação para balanceá-los.');
+                return;
+            } else {
+                poteOptionsDiv.style.display = 'none';
+                playerActionInfoDiv.style.display = 'none';
+            }
+
+            if (currentMode === 'individual-com-pote') {
+                generatedGames = generateGamesIndividualWithPot(pote1, pote2);
+            } else {
+                generatedGames = generateGamesFixedDuoWithPot(pote1, pote2);
+            }
+
+        } else {
+            const players = parsePlayerInput(jogadoresTextArea.value);
+            if (players.length < 4) {
+                showPopup('Erro de Configuração', 'Para os modos "Individual sem Pote" e "Dupla Fixa sem Pote", você precisa de pelo menos 4 jogadores.');
+                return generatedGames = []; 
+            }
+
+            if (currentMode === 'individual-sem-pote') {
+                generatedGames = generateGamesIndividualNoPot(players);
+            } else {
+                generatedGames = generateGamesFixedDuoNoPot(players); 
+            }
+        }
+
+        if (generatedGames.length === 0) {
+            showPopup('Erro de Geração', "Não foi possível gerar jogos com as configurações atuais. Verifique o número de jogadores e o modo de jogo.");
+            return;
+        }
+        
+        displayGames(generatedGames); 
+        updateClassification(); 
+        saveGameState(); 
+        setConfigurationFieldsDisabled(true); 
+        radiosModo.forEach(radio => radio.disabled = true);
+        
+        sortResultInfo.textContent = 'Os jogos foram criados com sucesso!'; // Display info below table
+
+    }
+
+    // --- Associações de Eventos ---
+    document.getElementById('btnSortear').addEventListener('click', handleSortGames);
+
+    document.getElementById('btnReiniciar').addEventListener('click', () => {
+        if (confirm('Tem certeza que deseja reiniciar e apagar todas as informações?')) {
+            resetApplicationState(true); 
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('button[data-tab="config"]').classList.add('active');
+            sections.forEach(sec => {
+                if (sec.id === 'config') sec.classList.add('active');
+                else sec.classList.remove('active');
+            });
+        }
+    });
 
     // Carrega o estado do jogo ao carregar a página
     window.addEventListener('load', loadGameState);
+
 </script>
+
 </body>
 </html>
