@@ -165,6 +165,22 @@
         margin-right: 5px; /* Espaço entre o rádio e o texto */
     }
 
+    /* Mensagens na página */
+    .in-page-message {
+        background-color: #e7f3fe; /* Light blue background */
+        border-left: 6px solid #2196F3; /* Blue border */
+        margin-top: 1rem;
+        padding: 10px 15px;
+        color: #0c5460; /* Darker blue text */
+        border-radius: 4px;
+        font-size: 0.95em;
+        text-align: center;
+    }
+    .in-page-message.error {
+        background-color: #f8d7da; /* Light red background */
+        border-left: 6px solid #dc3545; /* Red border */
+        color: #721c24; /* Darker red text */
+    }
 
     /* Media Queries para responsividade */
     @media (max-width: 768px) { /* Tablets e telas menores */
@@ -277,6 +293,7 @@
             <tbody>
                 </tbody>
         </table>
+        <div id="gameCreationMessage" class="in-page-message" style="display: none;"></div>
     </section>
 
     <section id="resultado">
@@ -295,6 +312,7 @@
             <tbody>
                 </tbody>
         </table>
+        <div id="championMessage" class="in-page-message" style="display: none;"></div>
         <p class="criteria-text">
             **Critérios de Desempate:**
             <ol class="criteria-list">
@@ -325,9 +343,13 @@
                 if (section.id === targetTab) section.classList.add('active');
                 else section.classList.remove('active');
             });
-            // Quando muda para a aba de resultado, atualiza a classificação e mostra o pop-up do campeão
+            // Quando muda para a aba de resultado, atualiza a classificação e mostra a mensagem do campeão
             if (targetTab === 'resultado') {
                 updateClassification(true); // true para indicar que é uma atualização de tab
+            } else {
+                // Esconde as mensagens ao trocar de aba
+                displayMessage('gameCreationMessage', '', false);
+                displayMessage('championMessage', '', false);
             }
         });
     });
@@ -349,6 +371,8 @@
     const quadrasInfoSpan = document.getElementById('quadrasInfo');
     const btnSortear = document.getElementById('btnSortear');
     const btnReiniciar = document.getElementById('btnReiniciar');
+    const gameCreationMessageDiv = document.getElementById('gameCreationMessage');
+    const championMessageDiv = document.getElementById('championMessage');
 
     // Estado global da aplicação
     let generatedGames = [];
@@ -384,11 +408,23 @@
     pote2TextArea.addEventListener('input', updateQuadrasInputLimits);
 
     /**
-     * Exibe um alerta simples (substituindo o pop-up).
+     * Exibe uma mensagem na página em um div específico.
+     * @param {string} elementId - O ID do elemento div onde a mensagem será exibida.
      * @param {string} message - A mensagem a ser exibida.
+     * @param {boolean} show - True para mostrar, false para esconder.
+     * @param {boolean} isError - True se for uma mensagem de erro (para estilização).
      */
-    function showAlert(message) {
-        alert(message);
+    function displayMessage(elementId, message, show, isError = false) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = message;
+            element.style.display = show ? 'block' : 'none';
+            if (isError) {
+                element.classList.add('error');
+            } else {
+                element.classList.remove('error');
+            }
+        }
     }
 
     /**
@@ -453,7 +489,7 @@
         if (savedGames) {
             generatedGames = JSON.parse(savedGames);
             displayGames(generatedGames);
-            updateClassification(); // Não mostra pop-up de campeão no load inicial
+            updateClassification(false); // Não mostra mensagem de campeão no load inicial
             tabButtons.forEach(btn => btn.classList.remove('active'));
             document.querySelector('button[data-tab="jogos"]').classList.add('active');
             sections.forEach(sec => {
@@ -589,7 +625,7 @@
         const n = allPlayers.length;
 
         if (n < 4) {
-            showAlert("Para o modo 'Individual sem pote', você precisa de pelo menos 4 jogadores para formar duplas.");
+            displayMessage('gameCreationMessage', "Para o modo 'Individual sem pote', você precisa de pelo menos 4 jogadores para formar duplas.", true, true);
             return [];
         }
 
@@ -678,7 +714,7 @@
         const numQuadras = parseInt(quadrasInput.value);
 
         if (numPote1 < 2 || numPote2 < 2) {
-            showAlert("Para o modo 'Individual com pote', você precisa de pelo menos 2 jogadores em cada pote para formar jogos válidos (dupla contra dupla).");
+            displayMessage('gameCreationMessage', "Para o modo 'Individual com pote', você precisa de pelo menos 2 jogadores em cada pote para formar jogos válidos (dupla contra dupla).", true, true);
             return [];
         }
 
@@ -1036,9 +1072,11 @@
         const value = parseInt(input.value);
 
         if (isNaN(value) || value < 0) {
-            showAlert('Por favor, insira um valor válido (0 ou mais) para os games.');
+            displayMessage('championMessage', 'Por favor, insira um valor válido (0 ou mais) para os games.', true, true);
             input.value = '';
             return;
+        } else {
+            displayMessage('championMessage', '', false); // Esconde mensagem de erro
         }
 
         if (generatedGames[gameIndex]) {
@@ -1055,11 +1093,11 @@
      * @param {boolean} fromTabSwitch - Indica se a função foi chamada por uma troca de aba.
      */
     function updateClassification(fromTabSwitch = false) {
-        const playerStats = {}; // { 'NomeJogador': { vitorias: N, derrotas: N, saldoGames: N, gamesGanhos: N, gamesPerdidos: N } }
-        let allPlayers = new Set();
+        const playerStats = {}; 
+        let allPlayersList = [];
         let isFixedDuoMode = currentMode.includes('dupla-fixa');
 
-        // Coleta todos os jogadores/duplas e inicializa estatísticas
+        // 1. Popula allPlayersList e garante que playerStats tenha entradas para todos os jogadores/duplas com 0s
         if (isFixedDuoMode) {
             if (currentMode.includes('com-pote')) {
                 const pote1 = parsePlayerInput(pote1TextArea.value);
@@ -1071,36 +1109,31 @@
             }
             // Adiciona as duplas fixas como "jogadores" para a classificação
             Object.values(fixedDuosMap).forEach(duoName => {
-                if (!playerStats[duoName]) {
-                    playerStats[duoName] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                    allPlayers.add(duoName);
-                }
+                allPlayersList.push(duoName);
             });
             headerName.textContent = 'Dupla';
         } else {
             if (currentMode.includes('com-pote')) {
                 const pote1 = parsePlayerInput(pote1TextArea.value);
                 const pote2 = parsePlayerInput(pote2TextArea.value);
-                [...pote1, ...pote2].forEach(player => {
-                    if (!playerStats[player]) {
-                        playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                        allPlayers.add(player);
-                    }
-                });
+                allPlayersList = [...pote1, ...pote2];
             } else {
-                parsePlayerInput(jogadoresTextArea.value).forEach(player => {
-                    if (!playerStats[player]) {
-                        playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                        allPlayers.add(player);
-                    }
-                });
+                allPlayersList = parsePlayerInput(jogadoresTextArea.value);
             }
             headerName.textContent = 'Jogador';
         }
 
+        // Inicializa todas as estatísticas para todos os jogadores/duplas
+        allPlayersList.forEach(player => {
+            if (!playerStats[player]) {
+                playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
+            }
+        });
+
+
         let allGamesCompleted = true; // Flag para verificar se todos os jogos têm resultados
 
-        // Processa os jogos e calcula as estatísticas
+        // 2. Processa os jogos e calcula as estatísticas
         generatedGames.forEach(game => {
             // Verifica se o jogo tem resultados inseridos e não é um jogo com "Livre"
             const isGameComplete = (game.gamesDuplaA !== undefined && game.gamesDuplaB !== undefined && 
@@ -1120,13 +1153,9 @@
                 playerA_identifier = Array.isArray(game.duplaA) ? game.duplaA.join(' & ') : game.duplaA;
                 playerB_identifier = Array.isArray(game.duplaB) ? game.duplaB.join(' & ') : game.duplaB;
                 
-                // Assegura que as estatísticas da dupla existam
-                if (!playerStats[playerA_identifier]) {
-                    playerStats[playerA_identifier] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                }
-                if (!playerStats[playerB_identifier]) {
-                    playerStats[playerB_identifier] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                }
+                // Assegura que as estatísticas da dupla existam (já deveriam existir pelo passo 1)
+                // if (!playerStats[playerA_identifier]) { playerStats[playerA_identifier] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 }; }
+                // if (!playerStats[playerB_identifier]) { playerStats[playerB_identifier] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 }; }
 
                 playerStats[playerA_identifier].gamesGanhos += scoreA;
                 playerStats[playerA_identifier].gamesPerdidos += scoreB;
@@ -1148,19 +1177,18 @@
             } else {
                 // Para modo individual, processa cada jogador dentro das duplas
                 game.duplaA.forEach(player => {
-                    // Inicializa gamesGanhos e gamesPerdidos para cada jogador se ainda não estiverem definidos
-                    if (!playerStats[player]) playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                    playerStats[player].gamesGanhos = (playerStats[player].gamesGanhos || 0) + scoreA;
-                    playerStats[player].gamesPerdidos = (playerStats[player].gamesPerdidos || 0) + scoreB;
-                    playerStats[player].saldoGames = (playerStats[player].saldoGames || 0) + (scoreA - scoreB);
-                    playerStats[player].jogosDisputados = (playerStats[player].jogosDisputados || 0) + 1;
+                    // if (!playerStats[player]) playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 }; // Já feito no passo 1
+                    playerStats[player].gamesGanhos += scoreA;
+                    playerStats[player].gamesPerdidos += scoreB;
+                    playerStats[player].saldoGames += (scoreA - scoreB);
+                    playerStats[player].jogosDisputados++;
                 });
                 game.duplaB.forEach(player => {
-                    if (!playerStats[player]) playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 };
-                    playerStats[player].gamesGanhos = (playerStats[player].gamesGanhos || 0) + scoreB;
-                    playerStats[player].gamesPerdidos = (playerStats[player].gamesPerdidos || 0) + scoreA;
-                    playerStats[player].saldoGames = (playerStats[player].saldoGames || 0) + (scoreB - scoreA);
-                    playerStats[player].jogosDisputados = (playerStats[player].jogosDisputados || 0) + 1;
+                    // if (!playerStats[player]) playerStats[player] = { vitorias: 0, derrotas: 0, saldoGames: 0, gamesGanhos: 0, gamesPerdidos: 0, jogosDisputados: 0 }; // Já feito no passo 1
+                    playerStats[player].gamesGanhos += scoreB;
+                    playerStats[player].gamesPerdidos += scoreA;
+                    playerStats[player].saldoGames += (scoreB - scoreA);
+                    playerStats[player].jogosDisputados++;
                 });
 
                 // Lógica de vitórias/derrotas para modo individual
@@ -1239,6 +1267,7 @@
 
         if (classification.length === 0) {
             tabelaResultadoBody.innerHTML = '<tr><td colspan="7">Nenhum resultado para exibir. Gere jogos e insira os placares.</td></tr>';
+            displayMessage('championMessage', '', false); // Esconde qualquer mensagem antiga
             return;
         }
 
@@ -1259,19 +1288,21 @@
             tabelaResultadoBody.appendChild(row);
         });
 
-        // Exibe alerta do campeão se todos os jogos estiverem completos E a chamada veio de troca de aba
+        // Exibe mensagem do campeão se todos os jogos estiverem completos E a chamada veio de troca de aba
         if (allGamesCompleted && fromTabSwitch) {
             const champion = classification[0];
             if (champion && champion.name !== 'Livre') {
-                showAlert(`Parabéns! O campeão é: ${champion.name} com ${champion.vitorias} vitórias!`);
+                displayMessage('championMessage', `🏆 Parabéns! O campeão é: ${champion.name} com ${champion.vitorias} vitória(s)!`, true);
             } else if (champion && champion.name === 'Livre' && classification.length > 1) {
                  const actualChampion = classification[1]; // Pega o segundo se o primeiro for 'Livre'
-                 showAlert(`Parabéns! O campeão é: ${actualChampion.name} com ${actualChampion.vitorias} vitórias!`);
+                 displayMessage('championMessage', `🏆 Parabéns! O campeão é: ${actualChampion.name} com ${actualChampion.vitorias} vitória(s)!`, true);
             } else {
-                 showAlert('Preencha todos os resultados dos jogos para ver o campeão!');
+                 displayMessage('championMessage', 'Preencha todos os resultados dos jogos para ver o campeão!', true, true);
             }
         } else if (!allGamesCompleted && fromTabSwitch) {
-            showAlert('Preencha todos os resultados dos jogos para ver o campeão!');
+            displayMessage('championMessage', 'Preencha todos os resultados dos jogos para ver o campeão!', true, true);
+        } else {
+             displayMessage('championMessage', '', false); // Esconde mensagem de campeão se não for de troca de aba
         }
     }
 
@@ -1301,12 +1332,15 @@
         setConfigurationFieldsDisabled(false);
         radiosModo.forEach(radio => radio.disabled = false); // Habilita os radios
 
+        displayMessage('gameCreationMessage', '', false); // Limpa mensagem de criação de jogos
+        displayMessage('championMessage', '', false); // Limpa mensagem de campeão
+
         if (clearSavedState) {
             localStorage.removeItem(LOCAL_STORAGE_KEY_GAMES);
             localStorage.removeItem(LOCAL_STORAGE_KEY_CONFIG);
             localStorage.removeItem(LOCAL_STORAGE_KEY_MODE_LOCKED);
             localStorage.removeItem(LOCAL_STORAGE_KEY_FIXED_DUOS);
-            showAlert('Todas as informações foram apagadas e o aplicativo foi reiniciado.');
+            displayMessage('gameCreationMessage', 'Todas as informações foram apagadas e o aplicativo foi reiniciado.', true); // Mensagem de reinício
         }
         updateQuadrasInputLimits(); // Garante que os limites da quadra sejam atualizados após o reset
     }
@@ -1316,7 +1350,7 @@
      */
     function handleSortGames() {
         if (localStorage.getItem(LOCAL_STORAGE_KEY_MODE_LOCKED) === 'true') {
-            showAlert('O sorteio já foi realizado. Se deseja mudar o modo de jogo, clique em "Reiniciar" para apagar os dados atuais.');
+            displayMessage('gameCreationMessage', 'O sorteio já foi realizado. Se deseja mudar o modo de jogo, clique em "Reiniciar" para apagar os dados atuais.', true, true);
             return;
         }
 
@@ -1328,7 +1362,7 @@
             pote2 = parsePlayerInput(pote2TextArea.value);
 
             if (pote1.length === 0 || pote2.length === 0) {
-                showAlert("Por favor, preencha os jogadores em ambos os potes.");
+                displayMessage('gameCreationMessage', "Por favor, preencha os jogadores em ambos os potes.", true, true);
                 return;
             }
 
@@ -1336,7 +1370,7 @@
                 generatedGames = generateGamesIndividualWithPot(pote1, pote2);
             } else if (currentMode === 'dupla-fixa-com-pote') {
                 if (pote1.length !== pote2.length) {
-                    showAlert("Para duplas fixas com pote, os potes devem ter o mesmo número de jogadores para formar duplas completas. Ajuste os jogadores ou mude o modo.");
+                    displayMessage('gameCreationMessage', "Para duplas fixas com pote, os potes devem ter o mesmo número de jogadores para formar duplas completas. Ajuste os jogadores ou mude o modo.", true, true);
                     return;
                 }
                 generatedGames = generateGamesFixedDuoWithPot(pote1, pote2);
@@ -1344,7 +1378,7 @@
         } else {
             players = parsePlayerInput(jogadoresTextArea.value);
             if (players.length === 0) {
-                showAlert("Por favor, insira os nomes dos jogadores.");
+                displayMessage('gameCreationMessage', "Por favor, insira os nomes dos jogadores.", true, true);
                 return;
             }
 
@@ -1355,24 +1389,25 @@
                 // É preciso ter essa função implementada! (se não está, é um bug)
                 // Assumindo que `generateGamesFixedDuoNoPot` existe ou será criada.
                 // Por agora, vou deixar um placeholder ou uma mensagem de erro se a função não existir.
-                showAlert("A função para 'Dupla fixa sem pote' ainda não foi implementada ou possui erros.");
+                displayMessage('gameCreationMessage', "A função para 'Dupla fixa sem pote' ainda não foi implementada ou possui erros.", true, true);
                 generatedGames = []; // Para evitar crash se a função não existir
             }
         }
 
         if (generatedGames.length === 0) {
-            showAlert("Não foi possível gerar jogos com as configurações atuais. Verifique o número de jogadores e o modo de jogo.");
+            // A mensagem de erro específica já é mostrada pelas funções generateGames...
+            // Não precisa de showAlert adicional aqui se já foi tratado
             return;
         }
         
         displayGames(generatedGames); 
-        updateClassification(); // Não mostra pop-up de campeão no sorteio inicial
+        updateClassification(false); // Não mostra mensagem de campeão no sorteio inicial
         saveGameState(); 
         setConfigurationFieldsDisabled(true); 
         // Trava os radios de modo após o sorteio
         radiosModo.forEach(radio => radio.disabled = true);
         
-        showAlert('Os jogos foram criados com sucesso!'); // Alerta de sorteio
+        displayMessage('gameCreationMessage', 'Os jogos foram criados com sucesso!', true);
     }
 
     // --- Associações de Eventos ---
