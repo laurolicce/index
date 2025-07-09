@@ -680,16 +680,17 @@
         let availablePote1 = shuffleArray([...pote1]);
         let availablePote2 = shuffleArray([...pote2]);
 
+        // O loop continuará enquanto houver jogadores suficientes para pelo menos um jogo
         while (availablePote1.length >= 2 && availablePote2.length >= 2) {
             let currentRoundGames = [];
             let quadraCounter = 1;
 
+            // Gera jogos para esta rodada, usando os jogadores atualmente disponíveis
             while (availablePote1.length >= 2 && availablePote2.length >= 2 && quadraCounter <= numQuadras) {
-                const selectedP1 = availablePote1.splice(0, 2); // 2 do pote 1
-                const selectedP2 = availablePote2.splice(0, 2); // 2 do pote 2
+                const selectedP1 = availablePote1.splice(0, 2); // Pega 2 jogadores do pote 1
+                const selectedP2 = availablePote2.splice(0, 2); // Pega 2 jogadores do pote 2
 
-                // Uma dupla com 2 P1 e outra com 2 P2 OU duplas mistas
-                // Vamos fazer duplas mistas para mais variedade: 1 P1 + 1 P2
+                // Forma duplas mistas (1 P1 + 1 P2)
                 const dupla1 = [selectedP1[0], selectedP2[0]].sort();
                 const dupla2 = [selectedP1[1], selectedP2[1]].sort();
 
@@ -704,14 +705,17 @@
                 });
                 quadraCounter++;
             }
-            games = games.concat(currentRoundGames);
-            roundCounter++;
 
-            // Se os potes ficaram vazios, recarrega para a próxima rodada
-            if (availablePote1.length < 2 || availablePote2.length < 2) {
-                availablePote1 = shuffleArray([...pote1]);
-                availablePote2 = shuffleArray([...pote2]);
+            // Se jogos foram formados nesta rodada, adiciona-os e incrementa o contador de rodadas
+            if (currentRoundGames.length > 0) {
+                games = games.concat(currentRoundGames);
+                roundCounter++;
+            } else {
+                // Se nenhum jogo foi formado nesta rodada (e ainda há jogadores nos potes),
+                // significa que não é mais possível formar jogos com os pares restantes.
+                break;
             }
+            // Não há mais recarga infinita dos potes, o loop terminará quando availablePote1 ou availablePote2 esvaziarem.
         }
         return games;
     }
@@ -742,27 +746,26 @@
 
         // Agora, gerar jogos entre as duplas
         let roundCounter = 1;
-        let availableDuplas = [...duplas];
+        let availableDuplas = [...duplas]; // Duplas disponíveis para a geração
 
-        while (availableDuplas.length >= 4) { // Pelo menos 4 duplas para 2 jogos (A vs B)
-            let duplasInThisRound = [...availableDuplas];
+        // O loop continua enquanto houver duplas suficientes para pelo menos um jogo
+        while (availableDuplas.length >= 2) { // Mínimo de 2 duplas para um jogo (A vs B)
             let currentRoundGames = [];
             let quadraCounter = 1;
 
-            while (duplasInThisRound.length >= 4 && quadraCounter <= numQuadras) {
-                let selectedForGame = []; // 4 duplas
-                for (let i = 0; i < 4; i++) {
-                    const randomIndex = Math.floor(Math.random() * duplasInThisRound.length);
-                    selectedForGame.push(duplasInThisRound[randomIndex]);
-                    duplasInThisRound.splice(randomIndex, 1);
-                }
+            // Gera jogos para esta rodada
+            while (availableDuplas.length >= 2 && quadraCounter <= numQuadras) {
+                let selectedForGame = []; // Seleciona 2 duplas para um jogo
+                const randomIndex1 = Math.floor(Math.random() * availableDuplas.length);
+                selectedForGame.push(availableDuplas[randomIndex1]);
+                availableDuplas.splice(randomIndex1, 1);
 
-                // Forma os confrontos de duplas
-                selectedForGame = shuffleArray(selectedForGame);
+                const randomIndex2 = Math.floor(Math.random() * availableDuplas.length);
+                selectedForGame.push(availableDuplas[randomIndex2]);
+                availableDuplas.splice(randomIndex2, 1);
+
                 const duplaA = selectedForGame[0];
                 const duplaB = selectedForGame[1];
-                const duplaC = selectedForGame[2]; // Duplas restantes para próximo confronto se houver
-                const duplaD = selectedForGame[3];
 
                 currentRoundGames.push({
                     round: roundCounter,
@@ -775,15 +778,14 @@
                 });
                 quadraCounter++;
             }
-            games = games.concat(currentRoundGames);
-            // Remove as duplas que jogaram nesta rodada da lista geral de disponíveis
-            availableDuplas = availableDuplas.filter(d => !currentRoundGames.some(game => game.duplaA === d || game.duplaB === d));
 
-            // Se todas as duplas disponíveis jogaram nesta rodada, reinicia o pool de duplas para a próxima rodada
-            if (availableDuplas.length < 4) {
-                availableDuplas = shuffleArray([...duplas]); // Recarrega todas as duplas
+            if (currentRoundGames.length > 0) {
+                games = games.concat(currentRoundGames);
+                roundCounter++;
+            } else {
+                break; // Não foi possível formar mais jogos
             }
-            roundCounter++;
+            // O loop terminará quando availableDuplas esvaziar
         }
         return games;
     }
@@ -816,26 +818,23 @@
 
         // Agora, gerar jogos entre as duplas formadas
         let roundCounter = 1;
-        let availableDuplas = [...duplas];
+        let availableDuplas = [...duplas]; // Duplas disponíveis para a geração
 
+        // O loop continua enquanto houver duplas suficientes para pelo menos um jogo
         while (availableDuplas.length >= 2) { // Mínimo de 2 duplas para um jogo (A vs B)
-            let duplasInThisRound = [...availableDuplas];
             let currentRoundGames = [];
             let quadraCounter = 1;
 
-            while (duplasInThisRound.length >= 2 && quadraCounter <= numQuadras) {
-                let selectedForGame = []; // 2 duplas
-                if (duplasInThisRound.length >= 2) {
-                    const randomIndex1 = Math.floor(Math.random() * duplasInThisRound.length);
-                    selectedForGame.push(duplasInThisRound[randomIndex1]);
-                    duplasInThisRound.splice(randomIndex1, 1);
+            // Gera jogos para esta rodada
+            while (availableDuplas.length >= 2 && quadraCounter <= numQuadras) {
+                let selectedForGame = []; // Seleciona 2 duplas para um jogo
+                const randomIndex1 = Math.floor(Math.random() * availableDuplas.length);
+                selectedForGame.push(availableDuplas[randomIndex1]);
+                availableDuplas.splice(randomIndex1, 1);
 
-                    const randomIndex2 = Math.floor(Math.random() * duplasInThisRound.length);
-                    selectedForGame.push(duplasInThisRound[randomIndex2]);
-                    duplasInThisRound.splice(randomIndex2, 1);
-                } else {
-                    break; // Não há duplas suficientes para formar um jogo
-                }
+                const randomIndex2 = Math.floor(Math.random() * availableDuplas.length);
+                selectedForGame.push(availableDuplas[randomIndex2]);
+                availableDuplas.splice(randomIndex2, 1);
 
                 const duplaA = selectedForGame[0];
                 const duplaB = selectedForGame[1];
@@ -851,13 +850,14 @@
                 });
                 quadraCounter++;
             }
-            games = games.concat(currentRoundGames);
-            availableDuplas = availableDuplas.filter(d => !currentRoundGames.some(game => game.duplaA === d || game.duplaB === d));
 
-            if (availableDuplas.length < 2) {
-                availableDuplas = shuffleArray([...duplas]); // Recarrega todas as duplas
+            if (currentRoundGames.length > 0) {
+                games = games.concat(currentRoundGames);
+                roundCounter++;
+            } else {
+                break; // Não foi possível formar mais jogos
             }
-            roundCounter++;
+            // O loop terminará quando availableDuplas esvaziar
         }
         return games;
     }
@@ -988,7 +988,7 @@
             const scoreB = Number(game.gamesDuplaB);
 
             if (isNaN(scoreA) || isNaN(scoreB) || (scoreA + scoreB) === 0) {
-                allGamesHaveScores = false; // Há pelo menos um jogo sem placar válido
+                allGamesHaveScores = false; // Há pelo menos um jogo sem placar válido ou com soma 0
                 return; // Não contabiliza estatísticas para jogos não finalizados/sem placar
             }
 
@@ -1064,7 +1064,9 @@
 
         // Lógica para exibir o campeão
         if (showChampionPopup) {
-            if (allGamesHaveScores) {
+            if (generatedGames.length === 0) {
+                 displayMessage('championMessage', 'Nenhum jogo foi sorteado ainda.', true, true);
+            } else if (allGamesHaveScores) {
                 if (sortedStats.length > 0) {
                     const champion = sortedStats[0];
                     let championName = champion.name;
@@ -1117,11 +1119,7 @@
                 displayMessage('gameCreationMessage', 'Ambos os potes devem conter jogadores.', true, true);
                 return;
             }
-            if (playersOrPot1.length !== pote2Players.length) {
-                 // Esta validação agora é feita dentro da função de geração de jogos
-                generatedGames = []; // Garante que nenhum jogo seja gerado se os potes forem diferentes
-                return; // Retorna para que a mensagem da função de geração seja exibida
-            }
+            // A validação de tamanho de pote diferente e mensagem é feita dentro da função de geração
         }
 
         if (currentMode === 'individual-sem-pote') {
@@ -1135,7 +1133,8 @@
         }
 
         if (generatedGames.length === 0) {
-            displayMessage('gameCreationMessage', 'Não foi possível gerar jogos com as configurações atuais. Verifique o número de jogadores/duplas e o modo de jogo.', true, true);
+            // Se as funções de geração retornarem vazio, elas já terão exibido uma mensagem de erro específica.
+            // Apenas retorna para evitar prosseguir com o estado inválido.
             return;
         }
 
